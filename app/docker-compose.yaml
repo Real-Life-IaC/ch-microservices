@@ -1,0 +1,35 @@
+---
+version: '3.8'
+
+services:
+  db:
+    image: amazon/dynamodb-local
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    volumes:
+      - "./:/app"
+    ports:
+      - 5001:5001
+    environment:
+      - DYNAMO_ENDPOINT=http://db:8000
+    depends_on:
+      - db
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.dynamo-admin
+    ports:
+      - 8002:8002
+    environment:
+      - DYNAMO_ENDPOINT=http://db:8000
+      - AWS_REGION=local
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - PORT=8002
+    depends_on:
+      - db
