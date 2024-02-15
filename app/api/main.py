@@ -1,5 +1,3 @@
-import os
-
 from typing import Any
 
 from api.db import initialize_db

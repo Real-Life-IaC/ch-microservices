@@ -9,6 +9,7 @@ from aws_cdk import aws_ec2 as ec2
 from aws_cdk import aws_ecr_assets as ecr_assets
 from aws_cdk import aws_events as events
 from aws_cdk import aws_events_targets as targets
+from aws_cdk import aws_kms as kms
 from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_logs as logs
 from aws_cdk import aws_route53 as route53
@@ -17,16 +18,15 @@ from aws_cdk import aws_ssm as ssm
 from constructs import Construct
 from typing_extensions import NotRequired
 from typing_extensions import Unpack
-from aws_cdk import aws_kms as kms
 
 
 class Params(TypedDict):
-    """Parameters for the UtilStaticSite class."""
+    """Parameters for the StaticSite class."""
 
     timeout_seconds: int
     memory_size: int
     domain_name: str
-    hosted_zone_type: NotRequired[str | None]
+    hosted_zone_type: NotRequired[str]
     log_retention: NotRequired[logs.RetentionDays]
 
 
@@ -45,19 +45,15 @@ class B1LambdaApi(Construct):
         timeout_seconds = kwargs["timeout_seconds"]
         memory_size = kwargs["memory_size"]
         domain_name = kwargs["domain_name"]
-        log_retention = kwargs.get(
-            "log_retention", logs.RetentionDays.ONE_WEEK
+        log_retention = (
+            kwargs.get("log_retention") or logs.RetentionDays.ONE_WEEK
         )
-        hosted_zone_type = kwargs.get("hosted_zone_type", "private")
-        cors_origins = [
-                    f"https://*.{domain_name}",
-                    f"https://{domain_name}",
-                    f"https://api.{domain_name}",
-                ]
-        
-        vpc_id = ssm.StringParameter.value_from_lookup(
+        hosted_zone_type = kwargs.get("hosted_zone_type") or "private"
+
+        # Import existing resources
+        kms_key_arn = ssm.StringParameter.value_for_string_parameter(
             scope=self,
-            parameter_name="/platform/vpc/id",
+            parameter_name="/platform/kms/default-key/arn",
         )
 
         stage_name = ssm.StringParameter.value_from_lookup(
@@ -65,36 +61,22 @@ class B1LambdaApi(Construct):
             parameter_name="/platform/stage",
         )
 
-        hosted_zone_name = ssm.StringParameter.value_for_string_parameter(
-            scope=self,
-            parameter_name=f"/platform/dns/{domain_name}/{hosted_zone_type}-hosted-zone/name",
-        )
-
-        hosted_zone_id = ssm.StringParameter.value_for_string_parameter(
-            scope=self,
-            parameter_name=f"/platform/dns/{domain_name}/{hosted_zone_type}-hosted-zone/id",
-        )
-
-        certificate_arn = ssm.StringParameter.value_for_string_parameter(
-            scope=self,
-            parameter_name=f"/platform/dns/{domain_name}/{hosted_zone_type}-hosted-zone/certificate/arn",
-        )
-
         certificate = acm.Certificate.from_certificate_arn(
             scope=self,
             id="Certificate",
-            certificate_arn=certificate_arn,
-        )
-
-        kms_key_arn = ssm.StringParameter.value_for_string_parameter(
-            scope=self,
-            parameter_name="/platform/kms/default-key/arn",
+            certificate_arn=ssm.StringParameter.value_for_string_parameter(
+                scope=self,
+                parameter_name=f"/platform/dns/{domain_name}/{hosted_zone_type}-hosted-zone/certificate/arn",
+            ),
         )
 
         vpc = ec2.Vpc.from_lookup(
             scope=self,
             id="Vpc",
-            vpc_id=vpc_id,
+            vpc_id=ssm.StringParameter.value_from_lookup(
+                scope=self,
+                parameter_name="/platform/vpc/id",
+            ),
         )
 
         kms_key = kms.Key.from_key_arn(
@@ -106,10 +88,17 @@ class B1LambdaApi(Construct):
         self.hosted_zone = route53.HostedZone.from_hosted_zone_attributes(
             scope=self,
             id="HostedZone",
-            hosted_zone_id=hosted_zone_id,
-            zone_name=hosted_zone_name,
+            hosted_zone_id=ssm.StringParameter.value_for_string_parameter(
+                scope=self,
+                parameter_name=f"/platform/dns/{domain_name}/{hosted_zone_type}-hosted-zone/id",
+            ),
+            zone_name=ssm.StringParameter.value_for_string_parameter(
+                scope=self,
+                parameter_name=f"/platform/dns/{domain_name}/{hosted_zone_type}-hosted-zone/name",
+            ),
         )
 
+        # Create Resources
         self.security_group = ec2.SecurityGroup(
             scope=self,
             id="SecurityGroup",
@@ -131,7 +120,6 @@ class B1LambdaApi(Construct):
             ),
         )
 
-        # Create Lambda function
         self.function = _lambda.DockerImageFunction(
             scope=self,
             id="Function",
@@ -166,19 +154,23 @@ class B1LambdaApi(Construct):
         )
         event_rule.add_target(targets.LambdaFunction(handler=self.function))  # type: ignore
 
-        # Create API Gateway
         lambda_api = apigateway.LambdaRestApi(
             scope=self,
             id="Api",
             handler=self.function,
             domain_name=apigateway.DomainNameOptions(
-                domain_name=f"api.{domain_name}", certificate=certificate,
+                domain_name=f"api.{self.hosted_zone.zone_name}",
+                certificate=certificate,
                 endpoint_type=apigateway.EndpointType.REGIONAL,
                 security_policy=apigateway.SecurityPolicy.TLS_1_2,
             ),
             proxy=False,
             default_cors_preflight_options=apigateway.CorsOptions(
-                allow_origins=cors_origins,
+                allow_origins=[
+                    f"https://*.{self.hosted_zone.zone_name}",
+                    f"https://{self.hosted_zone.zone_name}",
+                    f"https://api.{self.hosted_zone.zone_name}",
+                ],
                 allow_methods=apigateway.Cors.ALL_METHODS,
                 allow_headers=["*"],
             ),
@@ -208,13 +200,13 @@ class B1LambdaApi(Construct):
             ),
         )
 
+        # Add endpoints
         downloads = lambda_api.root.add_resource("downloads")
         downloads.add_method("POST", api_key_required=False)
 
         downloads_count = lambda_api.root.add_resource("downloads:count")
         downloads_count.add_method("GET", api_key_required=False)
 
-        # Add docs endpoint
         docs = lambda_api.root.add_resource("docs")
         docs.add_method("GET", api_key_required=False)
         openapi = lambda_api.root.add_resource("openapi.json")
@@ -230,6 +222,7 @@ class B1LambdaApi(Construct):
             ),
         )
 
+        # Export parameters
         ssm.StringParameter(
             scope=self,
             id="RestApiId",
