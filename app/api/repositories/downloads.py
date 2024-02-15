@@ -1,6 +1,7 @@
 import os
 
-from aws_lambda_powertools import Tracer, Logger
+from aws_lambda_powertools import Logger
+from aws_lambda_powertools import Tracer
 from mypy_boto3_dynamodb import DynamoDBServiceResource
 
 

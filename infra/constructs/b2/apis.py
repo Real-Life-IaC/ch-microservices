@@ -2,6 +2,7 @@ from typing import Optional
 
 from constructs import Construct
 from infra.constructs.b1.lambda_api import B1LambdaApi
+from infra.constructs.b1.sns_topic import B1LambdaSnsTopic
 
 
 class B2Apis(Construct):
@@ -15,7 +16,7 @@ class B2Apis(Construct):
     ) -> None:
         super().__init__(scope, id)
 
-        B1LambdaApi(
+        lambda_api = B1LambdaApi(
             scope=self,
             id="RealLifeIac",
             timeout_seconds=6,
@@ -23,3 +24,12 @@ class B2Apis(Construct):
             domain_name="real-life-iac.com",
             hosted_zone_type=hosted_zone_type,
         )
+        events = ["DownloadCreated"]
+
+        for event in events:
+            B1LambdaSnsTopic(
+                scope=self,
+                id=f"{event}Topic",
+                function=lambda_api.function,
+                event_name=event,
+            )
