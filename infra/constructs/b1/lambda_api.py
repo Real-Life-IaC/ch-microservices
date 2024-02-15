@@ -50,12 +50,6 @@ class B1LambdaApi(Construct):
         )
         hosted_zone_type = kwargs.get("hosted_zone_type") or "private"
 
-        cors_origins = [
-            f"https://*.{domain_name}",
-            f"https://{domain_name}",
-            f"https://api.{domain_name}",
-        ]
-
         # Import existing resources
         kms_key_arn = ssm.StringParameter.value_for_string_parameter(
             scope=self,
@@ -103,6 +97,12 @@ class B1LambdaApi(Construct):
                 parameter_name=f"/platform/dns/{domain_name}/{hosted_zone_type}-hosted-zone/name",
             ),
         )
+
+        cors_origins = [
+            f"https://*.{self.hosted_zone.zone_name}",
+            f"https://{self.hosted_zone.zone_name}",
+            f"https://api.{self.hosted_zone.zone_name}",
+        ]
 
         # Create Resources
         self.security_group = ec2.SecurityGroup(
@@ -165,7 +165,7 @@ class B1LambdaApi(Construct):
             id="Api",
             handler=self.function,
             domain_name=apigateway.DomainNameOptions(
-                domain_name=f"api.{domain_name}",
+                domain_name=f"api.{self.hosted_zone.zone_name}",
                 certificate=certificate,
                 endpoint_type=apigateway.EndpointType.REGIONAL,
                 security_policy=apigateway.SecurityPolicy.TLS_1_2,
