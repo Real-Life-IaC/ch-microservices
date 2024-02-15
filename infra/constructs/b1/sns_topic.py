@@ -26,14 +26,16 @@ class B1LambdaSnsTopic(Construct):
         delivery_stream_arn = (
             ssm.StringParameter.value_for_string_parameter(
                 scope=self,
-                parameter_name="/platform/events/s3-delivery-stream/arn",
+                parameter_name="/pubsub/s3-delivery-stream/arn",
             )
         )
 
         # Load subscription role ARN that allows SNS to publish events to Firehose
-        subscription_role_arn = ssm.StringParameter.value_for_string_parameter(
-            scope=self,
-            parameter_name="/platform/events/firehose-subscription-role/arn",
+        subscription_role_arn = (
+            ssm.StringParameter.value_for_string_parameter(
+                scope=self,
+                parameter_name="/pubsub/firehose-subscription-role/arn",
+            )
         )
 
         # Creates topic to receive event from lambda

@@ -21,7 +21,7 @@ from typing_extensions import Unpack
 
 
 class Params(TypedDict):
-    """Parameters for the UtilStaticSite class."""
+    """Parameters for the StaticSite class."""
 
     timeout_seconds: int
     memory_size: int
