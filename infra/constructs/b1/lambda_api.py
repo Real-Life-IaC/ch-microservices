@@ -26,7 +26,7 @@ class Params(TypedDict):
     timeout_seconds: int
     memory_size: int
     domain_name: str
-    hosted_zone_type: NotRequired[str | None]
+    hosted_zone_type: NotRequired[str]
     log_retention: NotRequired[logs.RetentionDays]
 
 
@@ -45,10 +45,11 @@ class B1LambdaApi(Construct):
         timeout_seconds = kwargs["timeout_seconds"]
         memory_size = kwargs["memory_size"]
         domain_name = kwargs["domain_name"]
-        log_retention = kwargs.get(
-            "log_retention", logs.RetentionDays.ONE_WEEK
+        log_retention = (
+            kwargs.get("log_retention") or logs.RetentionDays.ONE_WEEK
         )
-        hosted_zone_type = kwargs.get("hosted_zone_type", "private")
+        hosted_zone_type = kwargs.get("hosted_zone_type") or "private"
+
         cors_origins = [
             f"https://*.{domain_name}",
             f"https://{domain_name}",
