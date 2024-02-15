@@ -98,12 +98,6 @@ class B1LambdaApi(Construct):
             ),
         )
 
-        cors_origins = [
-            f"https://*.{self.hosted_zone.zone_name}",
-            f"https://{self.hosted_zone.zone_name}",
-            f"https://api.{self.hosted_zone.zone_name}",
-        ]
-
         # Create Resources
         self.security_group = ec2.SecurityGroup(
             scope=self,
@@ -172,7 +166,11 @@ class B1LambdaApi(Construct):
             ),
             proxy=False,
             default_cors_preflight_options=apigateway.CorsOptions(
-                allow_origins=cors_origins,
+                allow_origins=[
+                    f"https://*.{self.hosted_zone.zone_name}",
+                    f"https://{self.hosted_zone.zone_name}",
+                    f"https://api.{self.hosted_zone.zone_name}",
+                ],
                 allow_methods=apigateway.Cors.ALL_METHODS,
                 allow_headers=["*"],
             ),
