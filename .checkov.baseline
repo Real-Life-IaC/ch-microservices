@@ -1,58 +1,184 @@
 {
     "failed_checks": [
         {
-            "file": "/Frontend-production.template.json",
+            "file": "/Api-production.template.json",
             "findings": [
                 {
-                    "resource": "AWS::IAM::Policy.CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApidocsGETD91195AC",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApidownloadsPOST4F856444",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApidownloadscountGET970DE9C6",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApiopenapijsonGET2BAA4320",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Stage.ApiRealLifeIacApiDeploymentStageproduction2FD0064B",
+                    "check_ids": [
+                        "CKV_AWS_120",
+                        "CKV_AWS_76"
+                    ]
+                },
+                {
+                    "resource": "AWS::DynamoDB::GlobalTable.ApiRealLifeIacDownloads86E08529",
+                    "check_ids": [
+                        "CKV_AWS_165"
+                    ]
+                },
+                {
+                    "resource": "AWS::IAM::Policy.LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
                     "check_ids": [
                         "CKV_AWS_111"
                     ]
                 },
                 {
-                    "resource": "AWS::Lambda::Function.CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
+                    "resource": "AWS::Lambda::Function.ApiRealLifeIacFunctionC21E83FE",
+                    "check_ids": [
+                        "CKV_AWS_115"
+                    ]
+                },
+                {
+                    "resource": "AWS::Lambda::Function.LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
                     "check_ids": [
                         "CKV_AWS_115",
-                        "CKV_AWS_117",
-                        "CKV_AWS_173"
+                        "CKV_AWS_117"
                     ]
                 }
             ]
         },
         {
-            "file": "/Frontend-sandbox.template.json",
+            "file": "/Api-sandbox.template.json",
             "findings": [
                 {
-                    "resource": "AWS::IAM::Policy.CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApidocsGETD91195AC",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApidownloadsPOST4F856444",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApidownloadscountGET970DE9C6",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApiopenapijsonGET2BAA4320",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Stage.ApiRealLifeIacApiDeploymentStagesandbox21263C96",
+                    "check_ids": [
+                        "CKV_AWS_120",
+                        "CKV_AWS_76"
+                    ]
+                },
+                {
+                    "resource": "AWS::DynamoDB::GlobalTable.ApiRealLifeIacDownloads86E08529",
+                    "check_ids": [
+                        "CKV_AWS_165"
+                    ]
+                },
+                {
+                    "resource": "AWS::IAM::Policy.LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
                     "check_ids": [
                         "CKV_AWS_111"
                     ]
                 },
                 {
-                    "resource": "AWS::Lambda::Function.CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
+                    "resource": "AWS::Lambda::Function.ApiRealLifeIacFunctionC21E83FE",
+                    "check_ids": [
+                        "CKV_AWS_115"
+                    ]
+                },
+                {
+                    "resource": "AWS::Lambda::Function.LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
                     "check_ids": [
                         "CKV_AWS_115",
-                        "CKV_AWS_117",
-                        "CKV_AWS_173"
+                        "CKV_AWS_117"
                     ]
                 }
             ]
         },
         {
-            "file": "/Frontend-staging.template.json",
+            "file": "/Api-staging.template.json",
             "findings": [
                 {
-                    "resource": "AWS::IAM::Policy.CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApidocsGETD91195AC",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApidownloadsPOST4F856444",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApidownloadscountGET970DE9C6",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Method.ApiRealLifeIacApiopenapijsonGET2BAA4320",
+                    "check_ids": [
+                        "CKV_AWS_59"
+                    ]
+                },
+                {
+                    "resource": "AWS::ApiGateway::Stage.ApiRealLifeIacApiDeploymentStagestaging0074A202",
+                    "check_ids": [
+                        "CKV_AWS_120",
+                        "CKV_AWS_76"
+                    ]
+                },
+                {
+                    "resource": "AWS::DynamoDB::GlobalTable.ApiRealLifeIacDownloads86E08529",
+                    "check_ids": [
+                        "CKV_AWS_165"
+                    ]
+                },
+                {
+                    "resource": "AWS::IAM::Policy.LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
                     "check_ids": [
                         "CKV_AWS_111"
                     ]
                 },
                 {
-                    "resource": "AWS::Lambda::Function.CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
+                    "resource": "AWS::Lambda::Function.ApiRealLifeIacFunctionC21E83FE",
+                    "check_ids": [
+                        "CKV_AWS_115"
+                    ]
+                },
+                {
+                    "resource": "AWS::Lambda::Function.LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
                     "check_ids": [
                         "CKV_AWS_115",
-                        "CKV_AWS_117",
-                        "CKV_AWS_173"
+                        "CKV_AWS_117"
                     ]
                 }
             ]
