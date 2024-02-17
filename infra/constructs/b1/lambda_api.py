@@ -182,21 +182,8 @@ class B1LambdaApi(Construct):
                 data_trace_enabled=True,
                 metrics_enabled=True,
                 tracing_enabled=True,
-            ),
-        )
-
-        apigateway.UsagePlan(
-            scope=self,
-            id="UsagePlan",
-            api_stages=[
-                apigateway.UsagePlanPerApiStage(
-                    api=self.rest_api,
-                    stage=self.rest_api.deployment_stage,
-                )
-            ],
-            throttle=apigateway.ThrottleSettings(
-                rate_limit=2,
-                burst_limit=5,
+                throttling_rate_limit=2,
+                throttling_burst_limit=5,
             ),
         )
 
