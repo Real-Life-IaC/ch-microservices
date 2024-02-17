@@ -182,7 +182,7 @@ class B1LambdaApi(Construct):
                 data_trace_enabled=True,
                 metrics_enabled=True,
                 tracing_enabled=True,
-                throttling_rate_limit=0.1,
+                throttling_rate_limit=0.5,
                 throttling_burst_limit=1,
             ),
         )
