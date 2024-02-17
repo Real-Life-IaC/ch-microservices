@@ -27,8 +27,9 @@ class B2Apis(Construct):
         )
         events = ["DownloadCreated"]
 
-        B1ApiGatewayFirewall(scope=self, id="Firewall").web_acl.associate(
-            api=lambda_api.rest_api
+        firewall = B1ApiGatewayFirewall(scope=self, id="Firewall")
+        firewall.web_acl.associate(
+            api=lambda_api.rest_api,
         )
 
         for event in events:

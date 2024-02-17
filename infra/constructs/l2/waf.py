@@ -130,7 +130,7 @@ class WebAcl(wafv2.CfnWebACL):
         wafv2.CfnWebACLAssociation(
             scope=self,
             id="Association",
-            resource_arn=f"arn:aws:apigateway:{cdk.Aws.REGION}::/apis/{api.rest_api_id}",
+            resource_arn=f"arn:aws:apigateway:{cdk.Aws.REGION}::/restapis/{api.rest_api_id}/stages/{api.deployment_stage.stage_name}",
             web_acl_arn=self.web_acl_arn,
         )
 
