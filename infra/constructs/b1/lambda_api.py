@@ -26,7 +26,7 @@ class Params(TypedDict):
     timeout_seconds: int
     memory_size: int
     domain_name: str
-    hosted_zone_type: NotRequired[str]
+    hosted_zone_type: NotRequired[str | None]
     log_retention: NotRequired[logs.RetentionDays]
 
 
@@ -154,7 +154,7 @@ class B1LambdaApi(Construct):
         )
         event_rule.add_target(targets.LambdaFunction(handler=self.function))  # type: ignore
 
-        lambda_api = apigateway.LambdaRestApi(
+        self.rest_api = apigateway.LambdaRestApi(
             scope=self,
             id="Api",
             handler=self.function,
@@ -190,8 +190,8 @@ class B1LambdaApi(Construct):
             id="UsagePlan",
             api_stages=[
                 apigateway.UsagePlanPerApiStage(
-                    api=lambda_api,
-                    stage=lambda_api.deployment_stage,
+                    api=self.rest_api,
+                    stage=self.rest_api.deployment_stage,
                 )
             ],
             throttle=apigateway.ThrottleSettings(
@@ -201,15 +201,17 @@ class B1LambdaApi(Construct):
         )
 
         # Add endpoints
-        downloads = lambda_api.root.add_resource("downloads")
+        downloads = self.rest_api.root.add_resource("downloads")
         downloads.add_method("POST", api_key_required=False)
 
-        downloads_count = lambda_api.root.add_resource("downloads:count")
+        downloads_count = self.rest_api.root.add_resource(
+            "downloads:count"
+        )
         downloads_count.add_method("GET", api_key_required=False)
 
-        docs = lambda_api.root.add_resource("docs")
+        docs = self.rest_api.root.add_resource("docs")
         docs.add_method("GET", api_key_required=False)
-        openapi = lambda_api.root.add_resource("openapi.json")
+        openapi = self.rest_api.root.add_resource("openapi.json")
         openapi.add_method("GET", api_key_required=False)
 
         route53.ARecord(
@@ -218,7 +220,7 @@ class B1LambdaApi(Construct):
             zone=self.hosted_zone,
             record_name="api",
             target=route53.RecordTarget.from_alias(
-                route53_targets.ApiGateway(lambda_api),
+                route53_targets.ApiGateway(self.rest_api),
             ),
         )
 
@@ -227,7 +229,7 @@ class B1LambdaApi(Construct):
             scope=self,
             id="RestApiId",
             parameter_name="/api/rest-api/id",
-            string_value=lambda_api.rest_api_id,
+            string_value=self.rest_api.rest_api_id,
             description="The ID of the REST API",
         )
 
@@ -235,6 +237,8 @@ class B1LambdaApi(Construct):
             scope=self,
             id="RestApiUrl",
             parameter_name="/api/rest-api/url",
-            string_value=lambda_api.url,
+            string_value=self.rest_api.url,
             description="The URL of the REST API",
         )
+
+        # Add alarms

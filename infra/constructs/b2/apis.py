@@ -1,6 +1,7 @@
 from typing import Optional
 
 from constructs import Construct
+from infra.constructs.b1.firewall import B1ApiGatewayFirewall
 from infra.constructs.b1.lambda_api import B1LambdaApi
 from infra.constructs.b1.sns_topic import B1LambdaSnsTopic
 
@@ -25,6 +26,10 @@ class B2Apis(Construct):
             hosted_zone_type=hosted_zone_type,
         )
         events = ["DownloadCreated"]
+
+        B1ApiGatewayFirewall(scope=self, id="Firewall").web_acl.associate(
+            api=lambda_api.rest_api
+        )
 
         for event in events:
             B1LambdaSnsTopic(
