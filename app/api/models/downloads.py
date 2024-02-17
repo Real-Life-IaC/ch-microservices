@@ -40,19 +40,19 @@ class DownloadsModel(InputDownloadsModel):
     )
 
     created_at: datetime | str = Field(
-        default=str(datetime.utcnow()),
+        default_factory=lambda: datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"),
         title="The creation date of the download",
         description="The creation date of the download",
     )
 
     updated_at: datetime | str = Field(
-        default=str(datetime.utcnow()),
+        default_factory=lambda: datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"),
         title="The update date of the download",
         description="The update date of the download",
     )
 
-    verified: bool = Field(
-        default=False,
+    verified: Optional[bool] = Field(
+        default=None,
         title="If the order is valid",
         description="A flag indicating if the order is valid",
     )
