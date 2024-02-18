@@ -3,7 +3,6 @@ from typing import Optional
 from constructs import Construct
 from infra.constructs.b1.firewall import B1ApiGatewayFirewall
 from infra.constructs.b1.lambda_api import B1LambdaApi
-from infra.constructs.b1.sns_topic import B1LambdaSnsTopic
 
 
 class B2Apis(Construct):
@@ -25,17 +24,23 @@ class B2Apis(Construct):
             domain_name="real-life-iac.com",
             hosted_zone_type=hosted_zone_type,
         )
-        events = ["DownloadCreated"]
 
-        firewall = B1ApiGatewayFirewall(scope=self, id="Firewall")
+        # Add Resources / Endpoints
+        root = lambda_api.rest_api.root
+        downloads = root.add_resource("downloads")
+        downloads.add_method("POST", api_key_required=False)
+        downloads_count = root.add_resource("downloads:count")
+        downloads_count.add_method("GET", api_key_required=False)
+
+        docs = root.add_resource("docs")
+        docs.add_method("GET", api_key_required=False)
+        openapi = root.add_resource("openapi.json")
+        openapi.add_method("GET", api_key_required=False)
+
+        firewall = B1ApiGatewayFirewall(
+            scope=self,
+            id="Firewall",
+        )
         firewall.web_acl.associate(
             api=lambda_api.rest_api,
         )
-
-        for event in events:
-            B1LambdaSnsTopic(
-                scope=self,
-                id=f"{event}Topic",
-                function=lambda_api.function,
-                event_name=event,
-            )

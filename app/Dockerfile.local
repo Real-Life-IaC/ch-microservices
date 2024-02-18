@@ -2,6 +2,7 @@ FROM python:3.11
 
 ENV POETRY_VIRTUALENVS_CREATE=false
 ENV PATH="/root/.local/bin:$PATH"
+WORKDIR /home/app/
 
 # Install python poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
@@ -12,9 +13,6 @@ COPY pyproject.toml poetry.lock /
 # Extract dependencies from poetry.lock and install them with pip
 RUN poetry install
 
-# Copy only the relevant function code to the lambda
-COPY api api
-
 EXPOSE 5000
 
-CMD [ "poetry", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "5001"]
+CMD poetry run uvicorn api.main:app --host "0.0.0.0" --port 5001 --reload

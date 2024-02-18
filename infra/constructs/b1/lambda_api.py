@@ -61,6 +61,15 @@ class B1LambdaApi(Construct):
             parameter_name="/platform/stage",
         )
 
+        event_bus = events.EventBus.from_event_bus_arn(
+            scope=self,
+            id="EventBus",
+            event_bus_arn=ssm.StringParameter.value_for_string_parameter(
+                scope=self,
+                parameter_name="/pubsub/event-bus/arn",
+            ),
+        )
+
         certificate = acm.Certificate.from_certificate_arn(
             scope=self,
             id="Certificate",
@@ -111,11 +120,11 @@ class B1LambdaApi(Construct):
             id="Downloads",
             billing=dynamodb.Billing.on_demand(),
             partition_key=dynamodb.Attribute(
-                name="id",
+                name="order_id",
                 type=dynamodb.AttributeType.STRING,
             ),
             sort_key=dynamodb.Attribute(
-                name="created_at",
+                name="email",
                 type=dynamodb.AttributeType.STRING,
             ),
         )
@@ -141,10 +150,15 @@ class B1LambdaApi(Construct):
             environment_encryption=kms_key,
             environment={
                 "TABLE_NAME": self.table.table_name,
+                "EVENT_BUS_NAME": event_bus.event_bus_name,
             },
         )
 
+        # Allow lambda to read and write to the DynamoDB table
         self.table.grant_read_write_data(self.function)
+
+        # Allow lambda to publish to the pubsub event bus
+        event_bus.grant_put_events_to(self.function)
 
         # Trigger lambda every 4 minutes to keep it warm
         event_rule = events.Rule(
@@ -186,20 +200,6 @@ class B1LambdaApi(Construct):
                 throttling_burst_limit=1,
             ),
         )
-
-        # Add endpoints
-        downloads = self.rest_api.root.add_resource("downloads")
-        downloads.add_method("POST", api_key_required=False)
-
-        downloads_count = self.rest_api.root.add_resource(
-            "downloads:count"
-        )
-        downloads_count.add_method("GET", api_key_required=False)
-
-        docs = self.rest_api.root.add_resource("docs")
-        docs.add_method("GET", api_key_required=False)
-        openapi = self.rest_api.root.add_resource("openapi.json")
-        openapi.add_method("GET", api_key_required=False)
 
         route53.ARecord(
             scope=self,
