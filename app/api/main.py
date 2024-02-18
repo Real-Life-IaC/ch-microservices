@@ -1,6 +1,7 @@
 from typing import Any
 
 from api.db import initialize_db
+from api.eventbridge import initialize_eventbridge
 from api.models.downloads import DownloadsDomain
 from api.repositories.downloads import DownloadsRepository
 from api.routes.downloads import DownloadsRouter
@@ -22,7 +23,8 @@ app = FastAPI(
 )
 
 db = initialize_db()
-downloads_repository = DownloadsRepository(db)
+events = initialize_eventbridge()
+downloads_repository = DownloadsRepository(db=db, events=events)
 downloads_domain = DownloadsDomain(downloads_repository)
 downloads_router = DownloadsRouter(downloads_domain)
 

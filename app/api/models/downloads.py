@@ -40,13 +40,17 @@ class DownloadsModel(InputDownloadsModel):
     )
 
     created_at: datetime | str = Field(
-        default_factory=lambda: datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"),
+        default_factory=lambda: datetime.utcnow().strftime(
+            "%Y-%m-%d %H:%M:%S.%f"
+        ),
         title="The creation date of the download",
         description="The creation date of the download",
     )
 
     updated_at: datetime | str = Field(
-        default_factory=lambda: datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"),
+        default_factory=lambda: datetime.utcnow().strftime(
+            "%Y-%m-%d %H:%M:%S.%f"
+        ),
         title="The update date of the download",
         description="The update date of the download",
     )
@@ -77,5 +81,8 @@ class DownloadsDomain:
     def create_download(self, data: InputDownloadsModel) -> DownloadsModel:
         """Create a download"""
         data_model = DownloadsModel(**data.model_dump())
-        self.__repository.create_download(data_model.model_dump())
-        return data_model
+        response = self.__repository.create_download(
+            data_model.model_dump()
+        )
+        response_model = DownloadsModel(**response)
+        return response_model
