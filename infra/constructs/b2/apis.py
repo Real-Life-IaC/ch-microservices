@@ -1,5 +1,6 @@
 from typing import Optional
 
+from aws_cdk import aws_ssm as ssm
 from constructs import Construct
 from infra.constructs.b1.firewall import B1ApiGatewayFirewall
 from infra.constructs.b1.lambda_api import B1LambdaApi
@@ -37,10 +38,17 @@ class B2Apis(Construct):
         openapi = root.add_resource("openapi.json")
         openapi.add_method("GET", api_key_required=False)
 
-        firewall = B1ApiGatewayFirewall(
+        stage = ssm.StringParameter.value_from_lookup(
             scope=self,
-            id="Firewall",
+            parameter_name="/platform/stage",
         )
-        firewall.web_acl.associate(
-            api=lambda_api.rest_api,
-        )
+
+        if stage == "production":
+            # Add a firewall to the API
+            firewall = B1ApiGatewayFirewall(
+                scope=self,
+                id="Firewall",
+            )
+            firewall.web_acl.associate(
+                api=lambda_api.rest_api,
+            )
