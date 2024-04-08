@@ -237,7 +237,7 @@ class B1LambdaApi(Construct):
             id="AlarmTopic",
             topic_arn=ssm.StringParameter.value_for_string_parameter(
                 scope=self,
-                parameter_name="/platform/alarms/platform/sns/arn/",
+                parameter_name="/platform/alarms/platform/sns/arn",
             ),
         )
 
