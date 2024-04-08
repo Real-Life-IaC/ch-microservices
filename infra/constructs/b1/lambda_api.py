@@ -4,6 +4,8 @@ import aws_cdk as cdk
 
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_certificatemanager as acm
+from aws_cdk import aws_cloudwatch as cw
+from aws_cdk import aws_cloudwatch_actions as cw_actions
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_ec2 as ec2
 from aws_cdk import aws_ecr_assets as ecr_assets
@@ -14,6 +16,7 @@ from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_logs as logs
 from aws_cdk import aws_route53 as route53
 from aws_cdk import aws_route53_targets as route53_targets
+from aws_cdk import aws_sns as sns
 from aws_cdk import aws_ssm as ssm
 from constructs import Construct
 from typing_extensions import NotRequired
@@ -229,3 +232,28 @@ class B1LambdaApi(Construct):
         )
 
         # Add alarms
+        alarm_topic = sns.Topic.from_topic_arn(
+            scope=self,
+            id="AlarmTopic",
+            topic_arn=ssm.StringParameter.value_for_string_parameter(
+                scope=self,
+                parameter_name="/platform/alarms/platform/sns/arn/",
+            ),
+        )
+
+        errors_alarm = cw.Alarm(
+            scope=self,
+            id="LambdaErrorsAlarm",
+            alarm_description="Alarm if the Lambda function errors",
+            metric=self.function.metric_errors(
+                period=cdk.Duration.minutes(1)
+            ),
+            threshold=0,
+            evaluation_periods=1,
+            comparison_operator=cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
+            actions_enabled=True,
+        )
+
+        errors_alarm.add_alarm_action(
+            cw_actions.SnsAction(topic=alarm_topic)
+        )
