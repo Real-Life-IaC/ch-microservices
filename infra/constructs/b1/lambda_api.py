@@ -245,10 +245,11 @@ class B1LambdaApi(Construct):
             scope=self,
             id="LambdaErrorsAlarm",
             alarm_description="Alarm if the Lambda function errors",
-            metric=self.function.metric_errors(),
+            metric=self.function.metric_errors(
+                period=cdk.Duration.minutes(1)
+            ),
             threshold=0,
             evaluation_periods=1,
-            period=cdk.Duration.minutes(1),
             comparison_operator=cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
             actions_enabled=True,
         )
