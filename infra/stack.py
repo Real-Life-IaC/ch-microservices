@@ -25,6 +25,6 @@ class ApiStack(cdk.Stack):
         )
 
         # Add tags to everything in this stack
-        cdk.Tags.of(self).add(key="owner", value="Backend")
+        cdk.Tags.of(self).add(key="owner", value="backend")
         cdk.Tags.of(self).add(key="repo", value="ch-api")
-        cdk.Tags.of(self).add(key="stack", value=self.stack_name)
+        cdk.Tags.of(self).add(key="cost-center", value="engineering")
