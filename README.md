@@ -1,4 +1,4 @@
-# Chapter: API Repo
+# Chapter: Microservices Repo
 
 ### Create the virtual environment and install dependencies
 
