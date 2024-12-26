@@ -1,0 +1,34 @@
+FROM public.ecr.aws/lambda/python:3.11
+
+LABEL language=python \
+    version=3.11 \
+    runtime=aws-lambda \
+    extras=poetry
+
+ARG LAMBDA_INSIGHTS_VERSION=1.0.229.0
+ENV POETRY_VIRTUALENVS_CREATE=false
+ENV PATH="/root/.local/bin:$PATH"
+
+# Set SHELL to Bash with pipefail option
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+WORKDIR /
+
+# Install python poetry
+# Install Lambda Insights
+RUN curl -sSL https://install.python-poetry.org | python3 - \
+    && curl -O https://lambda-insights-extension.s3-ap-northeast-1.amazonaws.com/amazon_linux/lambda-insights-extension.${LAMBDA_INSIGHTS_VERSION}.rpm \
+    && rpm -U lambda-insights-extension.${LAMBDA_INSIGHTS_VERSION}.rpm \
+    && rm -f lambda-insights-extension.${LAMBDA_INSIGHTS_VERSION}.rpm
+
+# Copy the dependencies files to the Docker image
+COPY pyproject.toml poetry.lock /
+
+# Extract dependencies from poetry.lock and install them with pip
+RUN poetry export --format requirements.txt --without-hashes --output requirements.txt && \
+    pip3 install -r requirements.txt --target "${LAMBDA_TASK_ROOT}" --no-cache-dir --no-deps
+
+# Copy only the relevant function code to the lambda
+COPY code ${LAMBDA_TASK_ROOT}/code
+
+CMD [ "code.main.handler" ]

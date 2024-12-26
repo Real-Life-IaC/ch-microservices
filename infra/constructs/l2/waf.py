@@ -1,10 +1,7 @@
 from enum import StrEnum
-from typing import Optional
 
 import aws_cdk as cdk
-
-from aws_cdk import aws_apigateway as apigateway
-from aws_cdk import aws_wafv2 as wafv2
+from aws_cdk import aws_apigateway as apigateway, aws_wafv2 as wafv2
 from constructs import Construct
 
 
@@ -36,16 +33,14 @@ class WebAclAwsRule(wafv2.CfnWebACL.RuleProperty):
         self,
         name: AwsManagedRule,
         priority: int,
-        excluded_rules: Optional[list[str]] = None,
+        excluded_rules: list[str] | None = None,
     ) -> None:
         excluded_rules = excluded_rules or []
 
         super().__init__(
             name=f"AWS-{name}",
             priority=priority,
-            override_action=wafv2.CfnWebACL.OverrideActionProperty(
-                none={}
-            ),
+            override_action=wafv2.CfnWebACL.OverrideActionProperty(none={}),
             visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
                 cloud_watch_metrics_enabled=True,
                 metric_name=f"AWS-{name}",
@@ -53,12 +48,10 @@ class WebAclAwsRule(wafv2.CfnWebACL.RuleProperty):
             ),
             statement=wafv2.CfnWebACL.StatementProperty(
                 managed_rule_group_statement=wafv2.CfnWebACL.ManagedRuleGroupStatementProperty(
-                    excluded_rules=[
-                        {"name": rule_name} for rule_name in excluded_rules
-                    ],
+                    excluded_rules=[{"name": rule_name} for rule_name in excluded_rules],
                     name=name,
                     vendor_name="AWS",
-                )
+                ),
             ),
         )
 
@@ -110,7 +103,7 @@ class WebAcl(wafv2.CfnWebACL):
         metric_name: str,
         web_acl_scope: WebAclScope,
         default_action: WebAclAction = WebAclAction.ALLOW,
-        rules: Optional[list[WebAclAwsRule | WebAclCustomRule]] = None,
+        rules: list[WebAclAwsRule | WebAclCustomRule] | None = None,
     ) -> None:
         super().__init__(
             scope_=scope,

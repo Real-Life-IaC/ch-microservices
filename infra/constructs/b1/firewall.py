@@ -1,18 +1,20 @@
+import aws_cdk as cdk
 from aws_cdk import aws_ssm as ssm
 from constructs import Construct
+
 from infra.constructs.l2 import waf
 
 
 class B1ApiGatewayFirewall(Construct):
     """ApiGateway Firewall"""
 
-    def __init__(self, scope: Construct, id: str) -> None:
+    def __init__(self, scope: Construct, id: str, service_name: str) -> None:
         super().__init__(scope, id)
 
         self.web_acl = waf.WebAcl(
             scope=self,
             id="WebAcl",
-            metric_name="cloudfront",
+            metric_name="api_gateway",
             web_acl_scope=waf.WebAclScope.REGIONAL,
             default_action=waf.WebAclAction.ALLOW,
             rules=[
@@ -43,3 +45,5 @@ class B1ApiGatewayFirewall(Construct):
             description="Web Acl Arn for Api Gateway Waf with 100 rate limit",
             parameter_name="/api/firewall/arn",
         )
+
+        cdk.Tags.of(self).add(key="service-name", value=service_name)

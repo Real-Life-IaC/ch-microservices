@@ -1,0 +1,7 @@
+.dockerignore
+Dockerfile*
+docker-compose
+.venv
+tests
+README.md
+Makefile

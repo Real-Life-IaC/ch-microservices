@@ -1,0 +1,28 @@
+FROM python:3.11
+
+ENV POETRY_VIRTUALENVS_CREATE=false
+ENV PATH="/root/.local/bin:$PATH"
+
+# Set SHELL to Bash with pipefail option
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+WORKDIR /home/code/
+
+# Install python poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Copy the dependencies files to the Docker image
+COPY pyproject.toml poetry.lock ./
+
+# Install dependencies
+RUN poetry install --no-root
+
+# Expose the port
+EXPOSE 5001
+
+# DB migrations
+COPY code/migrations ./code/migrations
+COPY alembic.ini ./
+
+# Command to run the migrations and the application
+CMD ["sh", "-c", "poetry run alembic upgrade head && poetry run uvicorn code.main:app --host 0.0.0.0 --port 5001 --reload --no-server-header"]

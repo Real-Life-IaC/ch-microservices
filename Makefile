@@ -11,21 +11,36 @@ init: clean install checkov test ## Clean the environment and install all projec
 
 .PHONY: clean
 clean: ## Removes project virtual env and untracked files
-	rm -rf .venv cdk.out build dist **/*.egg-info .pytest_cache node_modules .coverage
+	rm -rf .venv **/.venv **/.venv.docker cdk.out build dist **/*.egg-info .pytest_cache node_modules .coverage **/__pycache__ **/*.pyc
+	@find functions -maxdepth 1 -mindepth 1 -type d ! -name "__pycache__" | while read dir; do \
+		echo "Removing $$dir venvs"; \
+		(cd "$$dir" && poetry env remove --all); \
+	done
 	poetry env remove --all
 
 .PHONY: install
 install: ## Install the project dependencies using Poetry.
-	poetry install --with lint,test,checkov,dev
+	@find functions -maxdepth 1 -mindepth 1 -type d ! -name "__pycache__" | while read dir; do \
+		echo "Installing $$dir"; \
+		(cd "$$dir" && poetry install --with test); \
+	done;
+	poetry install --with lint,test,checkov
 	poetry run pre-commit install --hook-type pre-commit --hook-type commit-msg --hook-type pre-push
 
 .PHONY: update
 update: ## Update the project dependencies using Poetry.
-	cd app && poetry update;
-	poetry update --with lint,test,checkov,dev
+	@find functions -maxdepth 1 -mindepth 1 -type d ! -name "__pycache__" | while read dir; do \
+		echo "Updating $$dir"; \
+		(cd "$$dir" && poetry update --with test); \
+	done;
+	poetry update --with lint,test,checkov
 
 .PHONY: test
 test: ## Run tests
+	@find functions -maxdepth 1 -mindepth 1 -type d ! -name "__pycache__" | while read dir; do \
+		echo "Running $$dir tests"; \
+		(cd "$$dir" && poetry run python -m pytest); \
+	done
 	poetry run python -m pytest
 
 .PHONY: lint
@@ -49,10 +64,11 @@ checkov-baseline: synth ## Run checkov and create a new baseline for future chec
 snapshot-update: ## Run tests and update the snapshots baseline
 	poetry run python -m pytest --snapshot-update
 
+
 .PHONY: up
-up: ## Creates a Dynamo DB and run the live API server locally
-	docker compose --file app/docker-compose.yaml up --no-deps --build --force-recreate --detach
+up: ## Run the live API server locally
+	docker compose --file docker-compose.yaml up --no-deps --build --force-recreate
 
 .PHONY: down
 down:  ## Kill the local app with Docker Compose
-	docker compose --file app/docker-compose.yaml down --volumes
+	docker compose --file docker-compose.yaml down --volumes

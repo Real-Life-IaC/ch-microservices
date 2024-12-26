@@ -1,0 +1,104 @@
+{
+    "folders": [
+        {
+            "name": "Root",
+            "path": ".",
+            "settings": {
+                "python.analysis.extraPaths": [
+                    "."
+                ],
+                "python.venvPath": ".venv",
+            }
+        },
+        {
+            "name": "Functions / Download Service",
+            "path": "functions/download_service",
+            "settings": {
+                "python.analysis.extraPaths": [
+                    "functions/download_service"
+                ],
+                "python.venvPath": "functions/download_service/.venv",
+            }
+        },
+        {
+            "name": "Functions / Email Service",
+            "path": "functions/email_service",
+            "settings": {
+                "python.analysis.extraPaths": [
+                    "functions/email_service"
+                ],
+                "python.venvPath": "functions/email_service/.venv",
+            }
+        }
+    ],
+    "settings": {
+        "python.languageServer": "Pylance",
+        "python.analysis.extraPaths": [],
+        "python.analysis.typeCheckingMode": "basic",
+        "python.analysis.diagnosticSeverityOverrides": {
+            "reportUnknownArgumentType": "information",
+            "reportOptionalSubscript": "information",
+            "reportOptionalIterable": "information",
+            "reportArgumentType": "information",
+            "reportGeneralTypeIssues": "information",
+        },
+        "files.exclude": {
+            "**/__pycache__": true,
+            "**/.pytest_cache": true,
+            "**/.coverage": true,
+            "**/*.egg-info": true,
+            "**/.ruff_cache": true,
+            "**/.mypy_cache": true,
+            "**/coverage.xml": true,
+        },
+        "ruff.lint.args": [
+            "--config=pyproject.toml"
+        ],
+        "ruff.format.args": [
+            "--config=pyproject.toml"
+        ]
+    },
+    "launch": {
+        "configurations": [
+            {
+                "name": "Python: Current File",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${file}",
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}"
+                }
+            }
+        ],
+        "compounds": []
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "tobiasalthoff.atom-material-theme",
+            "ms-vscode.atom-keybindings",
+            "amazonwebservices.aws-toolkit-vscode",
+            "samuelcolvin.jinjahtml",
+            "aws-scripting-guy.cform",
+            "pomdtr.excalidraw-editor",
+            "github.vscode-github-actions",
+            "github.copilot",
+            "codezombiech.gitignore",
+            "eamodio.gitlens",
+            "znck.grammarly",
+            "davidwang.ini-for-vscode",
+            "zainchen.json",
+            "bierner.markdown-emoji",
+            "pkief.material-icon-theme",
+            "equinusocio.vsc-material-theme",
+            "ms-python.debugpy",
+            "mechatroner.rainbow-csv",
+            "be5invis.toml",
+            "redhat.vscode-yaml",
+            "charliermarsh.ruff",
+            "ms-python.vscode-pylance",
+        ]
+    }
+}
