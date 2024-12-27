@@ -79,8 +79,8 @@ class B2EmailService(Construct):
             event_pattern=events.EventPattern(
                 source=events.Match.exact_string("downloadService"),
                 detail_type=events.Match.any_of(
-                    "download.requested",
-                    "download.completed",
+                    "book.requested",
+                    "book.completed",
                 ),
             ),
         )

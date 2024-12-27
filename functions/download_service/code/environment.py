@@ -8,6 +8,6 @@ DB_SECRET_NAME = os.environ.get("DB_SECRET_NAME", "/postgres")
 LOCALSTACK_ENDPOINT = os.environ.get("LOCALSTACK_ENDPOINT")
 BUCKET_NAME = os.environ.get("BUCKET_NAME", "real-life-iac")
 EBOOK_OBJECT_KEY = os.environ.get("EBOOK_OBJECT_KEY", "ebook.pdf")
-API_URL = os.environ.get("API_URL", "http://localhost:5001")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5001")
 TOKEN_EXPIRATION_HOURS = 48
 BACKOFF_SECONDS = 90

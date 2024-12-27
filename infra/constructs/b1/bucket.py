@@ -74,6 +74,15 @@ class B1Bucket(s3.Bucket):
             transfer_acceleration=transfer_acceleration,
             auto_delete_objects=auto_delete_objects,
             removal_policy=removal_policy,
+            cors=[
+                {
+                    "allowedMethods": [
+                        s3.HttpMethods.GET,
+                    ],
+                    "allowedOrigins": ["*"],
+                    "allowedHeaders": ["*"],
+                },
+            ],
         )
 
         # Denies HTTP traffic

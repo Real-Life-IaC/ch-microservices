@@ -29,7 +29,7 @@ async def process(parsed_event: EventBridgeEvent) -> None:
 
 @logger.inject_lambda_context(log_event=True)
 @tracer.capture_lambda_handler(capture_response=False)
-def lambda_handler(event: dict[str, Any], _context: LambdaContext) -> None:
+def handler(event: dict[str, Any], _context: LambdaContext) -> None:
     """AWS Lambda handler for cloud events."""
     if (
         isinstance(event, dict)

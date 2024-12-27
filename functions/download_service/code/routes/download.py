@@ -1,7 +1,7 @@
 from code.db import get_session
 from code.environment import SERVICE_NAME
 from code.eventbridge import EventBridge, get_eventbridge
-from code.models import DownloadCreate, DownloadStatistics
+from code.models import DownloadCreate, DownloadResponse, DownloadStatistics
 from code.repos.download import DownloadRepo
 from typing import Annotated
 
@@ -13,7 +13,6 @@ from fastapi import (
     Path,
     status,
 )
-from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -23,18 +22,18 @@ tracer = Tracer(service=SERVICE_NAME)
 router = APIRouter()
 
 
-@router.get("/download/{token}", status_code=status.HTTP_303_SEE_OTHER)
+@router.get("/download/{token}", response_model=DownloadResponse)
 async def download_book(
     session: Annotated[AsyncSession, Depends(get_session)],
     eventbridge: Annotated[EventBridge, Depends(get_eventbridge)],
     token: Annotated[str, Path(description="Token to download the file")],
-) -> RedirectResponse:
+) -> DownloadResponse:
     """Exchange a token for a presigned URL to download the book"""
 
     download_repo = DownloadRepo(session=session, eventbridge=eventbridge)
     download = await download_repo.get(token)
 
-    return RedirectResponse(url=download.presigned_url)
+    return DownloadResponse(url=download.presigned_url)
 
 
 @router.post("/request", status_code=status.HTTP_201_CREATED)

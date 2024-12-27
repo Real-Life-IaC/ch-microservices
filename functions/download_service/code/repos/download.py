@@ -34,19 +34,19 @@ class DownloadRepo:
         if not record:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Invalid link.",
+                detail="Invalid link. Please request a new one.",
             )
 
         if record.is_downloaded:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Link already used.",
+                detail="Link already used. Please request a new one.",
             )
 
         if current_timestamp > record.expires_at:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Link expired.",
+                detail="Link expired. Please request a new one.",
             )
 
         record.downloaded_at = current_timestamp

@@ -1,9 +1,9 @@
 import datetime as dt
 import secrets
 from code.environment import (
-    API_URL,
     BUCKET_NAME,
     EBOOK_OBJECT_KEY,
+    FRONTEND_URL,
     TOKEN_EXPIRATION_HOURS,
 )
 from code.models.base import UuidModel
@@ -73,7 +73,7 @@ class Download(UuidModel, table=True):
     def __init__(self, **data) -> None:
         super().__init__(**data)
         if not self.link:
-            self.link = f"{API_URL}/download/{self.token}"
+            self.link = f"{FRONTEND_URL}/download/{self.token}"
 
 
 def generate_presigned_url() -> str:
@@ -100,3 +100,9 @@ class DownloadStatistics(BaseModel):
 
     requested: int
     downloaded: int
+
+
+class DownloadResponse(BaseModel):
+    """Pydantic model to return the presigned URL"""
+
+    url: str

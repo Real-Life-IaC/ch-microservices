@@ -1,1 +1,1 @@
-from code.models.download import Download, DownloadCreate, DownloadStatistics
+from code.models.download import Download, DownloadCreate, DownloadResponse, DownloadStatistics

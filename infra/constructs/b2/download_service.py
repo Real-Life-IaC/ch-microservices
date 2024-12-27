@@ -105,7 +105,7 @@ class B2DownloadService(Construct):
                 "DB_SECRET_NAME": aurora_db.credentials.secret_name,
                 "BUCKET_NAME": bucket.bucket_name,
                 "EBOOK_OBJECT_KEY": ebook_object_key,
-                "API_URL": f"api.{hosted_zone.zone_name}",
+                "FRONTEND_URL": f"{hosted_zone.zone_name}",
             },
         )
 

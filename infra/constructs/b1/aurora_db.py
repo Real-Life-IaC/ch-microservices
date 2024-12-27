@@ -73,10 +73,10 @@ class B1AuroraDB(Construct):
 
         self.database_name = database_name
 
-        # # CIDR block of the VPN
-        vpn_cidr_block = ssm.StringParameter.value_from_lookup(
+        # CIDR block of the VPN
+        vpn_cidr_block = ssm.StringParameter.value_for_string_parameter(
             scope=self,
-            parameter_name="/platform/vpn/transit-gateway/cidr-block",
+            parameter_name="/vpn/transit-gateway/cidr-block",
         )
 
         # Add ingress rules to the security group
