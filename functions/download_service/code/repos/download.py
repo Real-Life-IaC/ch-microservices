@@ -27,7 +27,7 @@ class DownloadRepo:
         """Get a new book download link"""
 
         current_timestamp = dt.datetime.now(tz=dt.UTC)
-        stmt = select(Download).where(Download.token == token)
+        stmt = select(Download).where(Download.id.hex == token)
         result = await self.__session.execute(stmt)
         record = result.scalars().one_or_none()
 
