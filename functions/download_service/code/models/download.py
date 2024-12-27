@@ -39,7 +39,7 @@ class Download(UuidModel, table=True):
         title="Token",
         description="The token used to download the file",
         index=True,
-        default_factory=lambda: secrets.token_urlsafe(48),
+        default_factory=lambda: secrets.token_urlsafe(16),
     )
 
     link: str | None = Field(title="Link", description="The link to download the file with the token", default=None)
