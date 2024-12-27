@@ -6,6 +6,7 @@ from aws_lambda_powertools.utilities.parameters import GetParameterError, get_se
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 
 
 tracer = Tracer(service=SERVICE_NAME)
@@ -39,11 +40,7 @@ except GetParameterError:
 
 engine = create_async_engine(
     url=URL.create(**db_secret),
-    pool_size=5,
-    max_overflow=20,
-    pool_recycle=1800,
-    pool_pre_ping=True,
-    pool_use_lifo=True,
+    poolclass=NullPool,
 )
 
 
