@@ -1,5 +1,4 @@
 import datetime as dt
-import secrets
 from code.environment import (
     BUCKET_NAME,
     EBOOK_OBJECT_KEY,
@@ -35,13 +34,6 @@ class Download(UuidModel, table=True):
         description="The name of the person who requested the download",
     )
 
-    token: str = Field(
-        title="Token",
-        description="The token used to download the file",
-        index=True,
-        default_factory=lambda: secrets.token_urlsafe(16),
-    )
-
     link: str | None = Field(title="Link", description="The link to download the file with the token", default=None)
 
     expires_at: dt.datetime = Field(
@@ -73,7 +65,7 @@ class Download(UuidModel, table=True):
     def __init__(self, **data) -> None:
         super().__init__(**data)
         if not self.link:
-            self.link = f"{FRONTEND_URL}/download/{self.token}"
+            self.link = f"{FRONTEND_URL}/download/{self.id.hex}"
 
 
 def generate_presigned_url() -> str:

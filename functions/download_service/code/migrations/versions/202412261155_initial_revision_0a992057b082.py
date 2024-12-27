@@ -27,7 +27,6 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("email", sqlmodel.String(), nullable=False),
         sa.Column("name", sqlmodel.String(), nullable=False),
-        sa.Column("token", sqlmodel.String(), nullable=False),
         sa.Column("link", sqlmodel.String(), nullable=True),
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("is_downloaded", sa.Boolean(), nullable=False),
