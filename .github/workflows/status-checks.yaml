@@ -1,43 +1,76 @@
 ---
 name: Status Checks
 
-on:
-  push:
-    branches-ignore:
-      - main
+on: push
+
+permissions:
+  contents: read
 
 jobs:
-  test:
-    name: Test
+  install-dependencies:
+    name: Install Deps
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set Up Environment
+      - name: Set Up Environment and Cache Dependencies
+        uses: ./.github/actions/setup
+        with:
+          github-token: ${{ secrets.MACHINE_USER_PAT }}
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        path:
+          - functions/download_service
+          - functions/email_service
+          - .
+    needs:
+      - install-dependencies
+    concurrency:
+      group: test-${{ matrix.path }}-${{ github.workflow }}-${{ github.actor }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Up Environment and load Cached Dependencies
         uses: ./.github/actions/setup
 
-      - name: Install Test Dependencies
+      - name: Install Dependencies
         shell: bash
-        run: poetry install --with test
+        run: |
+          cd ${{ matrix.path }}
+          poetry install --with test
 
       - name: Pytest
         shell: bash
-        run: poetry run python -m pytest
+        run: |
+          cd ${{ matrix.path }}
+          poetry run python -m pytest
 
       - name: Coverage
         shell: bash
-        run: poetry run coverage lcov
+        run: |
+          cd ${{ matrix.path }}
+          poetry run coverage lcov
 
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    needs:
+      - install-dependencies
+    concurrency:
+      group: lint-${{ github.workflow }}-${{ github.actor }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set Up Environment
+      - name: Set Up Environment and load Cached Dependencies
         uses: ./.github/actions/setup
 
-      - name: Install Lint Dependencies
+      - name: Install Dependencies
         shell: bash
         run: poetry install --with lint
 
@@ -48,13 +81,18 @@ jobs:
   checkov:
     name: Checkov
     runs-on: ubuntu-latest
+    needs:
+      - install-dependencies
+    concurrency:
+      group: checkov-${{ github.workflow }}-${{ github.actor }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set Up Environment
+      - name: Set Up Environment and load Cached Dependencies
         uses: ./.github/actions/setup
 
-      - name: Install Checkov Dependencies
+      - name: Install Dependencies
         shell: bash
         run: poetry install --with checkov
 
@@ -64,7 +102,4 @@ jobs:
 
       - name: Checkov
         shell: bash
-        run: |
-          poetry run checkov \
-            --config-file .checkov \
-            --baseline .checkov.baseline
+        run: poetry run checkov --config-file .checkov --baseline .checkov.baseline
