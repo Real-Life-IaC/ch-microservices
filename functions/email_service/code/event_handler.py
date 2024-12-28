@@ -1,8 +1,11 @@
 import asyncio
+from code.db import get_session
 from code.environment import SERVICE_NAME
 from code.eventbridge import get_eventbridge
-from code.models.email import Email
-from code.repos.email import EmailRepo
+from code.models import BookRequest, Mailing
+from code.repos.book_request import BookRequestRepo
+from code.repos.mailing import MailingRepo
+from code.ses import get_ses
 from typing import Any
 
 from aws_lambda_powertools import Logger, Tracer
@@ -19,12 +22,23 @@ async def process(parsed_event: EventBridgeEvent) -> None:
     """Process events."""
 
     eventbridge = await anext(get_eventbridge())
-    email_repo = EmailRepo(eventbridge=eventbridge)
+    ses = await anext(get_ses())
+    session = await anext(get_session())
+
+    book_request_repo = BookRequestRepo(eventbridge=eventbridge, ses=ses)
+    mailing_repo = MailingRepo(eventbridge=eventbridge, session=session)
 
     if parsed_event.detail_type == "book.requested":
-        await email_repo.send(Email(**parsed_event.detail))
+        await book_request_repo.send(BookRequest(**parsed_event.detail))
+        await mailing_repo.create(new=Mailing(**parsed_event.detail))
+
+    elif parsed_event.detail_type == "book.downloaded":
+        await mailing_repo.validate(email=parsed_event.detail["email"])
+
     else:
-        logger.warning("Unhandled event type", event_type=parsed_event.detail_type)
+        msg = "Unhandled event type"
+        logger.exception("Unhandled event type", event_type=parsed_event.detail_type)
+        raise RuntimeError(msg)
 
 
 @logger.inject_lambda_context(log_event=True)

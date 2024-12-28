@@ -71,4 +71,4 @@ up: ## Run the live API server locally
 
 .PHONY: down
 down:  ## Kill the local app with Docker Compose
-	docker compose --file docker-compose.yaml down --volumes
+	docker compose --file docker-compose.yaml down

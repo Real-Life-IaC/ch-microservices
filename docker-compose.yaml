@@ -1,26 +1,23 @@
 ---
 services:
   localstack:
-    image: localstack/localstack
+    container_name: "${LOCALSTACK_DOCKER_NAME:-localstack-main}"
+    image: localstack/localstack-pro
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
       - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+      - "127.0.0.1:443:443"              # LocalStack HTTPS Gateway (Pro)
     environment:
-      AWS_DEFAULT_REGION: us-east-2
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
-      DEBUG: ${DEBUG:-1}
-      DOCKER_HOST: unix:///var/run/docker.sock
-      LS_LOG: WARN
-      HOSTNAME: localstack
-      LOCALSTACK_HOST: localstack
+      DEBUG: 1
+      PERSISTENCE: 1
+      LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:?}  # required for Pro
     volumes:
-      - "${TMPDIR:-/tmp}/localstack:/var/lib/localstack"
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
     restart: unless-stopped
     healthcheck:
       test: curl --fail http://localhost:4566 || exit 1
-      interval: 3s
+      interval: 60s
       retries: 30
       start_period: 20s
       timeout: 120s
@@ -45,7 +42,6 @@ services:
       timeout: 120s
       retries: 15
       start_period: 20s
-
   download_service:
     container_name: download_service
     build:
@@ -76,23 +72,27 @@ services:
     container_name: email_service
     build:
       context: ./functions/email_service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.local
     volumes:
       - "./functions/email_service:/home/code"
       - "./functions/email_service/.venv.docker:/home/code/.venv"
     ports:
-      - "9000:8080"
+      - 5002:5002
     environment:
       - LOCALSTACK_ENDPOINT=http://localstack:4566
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_DEFAULT_REGION=us-east-1
-      - AWS_LAMBDA_FUNCTION_MEMORY_SIZE=128
-      - AWS_LAMBDA_FUNCTION_TIMEOUT=3
-      - DOCKER_LAMBDA_USE_STDIN=1
     depends_on:
       - localstack
       - postgres-db
+    restart: unless-stopped
+    healthcheck:
+      test: curl --fail http://localhost:5002/health || exit 1
+      interval: 60s
+      retries: 30
+      start_period: 20s
+      timeout: 120s
 
 
 volumes:

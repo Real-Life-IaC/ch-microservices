@@ -300,6 +300,22 @@ publication = ">=0.0.3"
 typeguard = ">=2.13.3,<4.3.0"
 
 [[package]]
+name = "awscli-local"
+version = "0.22.0"
+description = "Thin wrapper around the \"aws\" command line interface for use with LocalStack"
+optional = false
+python-versions = "*"
+files = [
+    {file = "awscli-local-0.22.0.tar.gz", hash = "sha256:3807cf2ee4bbdd4df4dfc8bef027f25bde523dcaf8119720f677ed95ebba66a4"},
+]
+
+[package.dependencies]
+localstack-client = "*"
+
+[package.extras]
+ver1 = ["awscli"]
+
+[[package]]
 name = "bc-detect-secrets"
 version = "1.5.33"
 description = "Tool for detecting secrets in the codebase"
@@ -1562,6 +1578,22 @@ files = [
 [package.extras]
 docs = ["Sphinx (>=5.0.2)", "doc8 (>=0.11.2)", "sphinx-autobuild", "sphinx-copybutton", "sphinx-reredirects (>=0.1.2)", "sphinx-rtd-dark-mode (>=1.3.0)", "sphinx-rtd-theme (>=1.0.0)", "sphinxcontrib-apidoc (>=0.4.0)"]
 testing = ["black", "isort", "pytest (>=6,!=7.0.0)", "pytest-xdist (>=2)", "twine"]
+
+[[package]]
+name = "localstack-client"
+version = "2.7"
+description = "A lightweight Python client for LocalStack."
+optional = false
+python-versions = "*"
+files = [
+    {file = "localstack_client-2.7.tar.gz", hash = "sha256:14993119901a4bcbef7c32d899b24f4a58a875a6765693edf1064d66b8a68408"},
+]
+
+[package.dependencies]
+boto3 = "*"
+
+[package.extras]
+test = ["black", "coverage", "flake8", "isort", "localstack", "pytest"]
 
 [[package]]
 name = "mako"
@@ -3582,4 +3614,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "284431d14601753660d1665b7ebac9ca8ae45b67db0559aef5a9b55cff673fb1"
+content-hash = "061f03cd4abd024b90a5b2519ccbfdeb9a13409861c3917c7911a185a20315fa"

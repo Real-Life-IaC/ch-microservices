@@ -30,5 +30,3 @@ RUN poetry export --format requirements.txt --without-hashes --output requiremen
 
 # Copy only the relevant function code to the lambda
 COPY code ${LAMBDA_TASK_ROOT}/code
-
-CMD [ "code.main.handler" ]

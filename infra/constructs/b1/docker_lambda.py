@@ -42,6 +42,7 @@ class B1DockerLambdaFunction(Construct):
         subscription_teams: list[str],
         vpc: ec2.IVpc,
         security_group: ec2.SecurityGroup,
+        cmd: list[str],
         environment_vars: dict | None = None,
         log_retention: logs.RetentionDays = logs.RetentionDays.ONE_MONTH,
         dockerfile: str = "Dockerfile",
@@ -65,6 +66,7 @@ class B1DockerLambdaFunction(Construct):
             environment_vars (dict, optional): Extra environment variables for the function (default: None)
             log_retention (logs.RetentionDays, optional): Log retention for the function (default: logs.RetentionDays.ONE_MONTH)
             dockerfile (str, optional): Dockerfile for the function (default: "Dockerfile")
+            cmd (list[str]): Command to run in the Dockerfile
             build_secrets (dict, optional): Extra build secrets for the function (default: None)
             build_args (dict, optional): Extra build args for the function (default: None)
             dead_letter_queue_enabled (bool, optional): Whether to enable the dead letter queue for the function (default: False)
@@ -77,10 +79,7 @@ class B1DockerLambdaFunction(Construct):
         build_args = build_args or {}
 
         # Import existing resources
-        stage_name = ssm.StringParameter.value_from_lookup(
-            scope=self,
-            parameter_name="/platform/stage",
-        )
+        stage_name = ssm.StringParameter.value_from_lookup(scope=self, parameter_name="/platform/stage")
 
         kms_key = kms.Key.from_key_arn(
             scope=self,
@@ -98,6 +97,7 @@ class B1DockerLambdaFunction(Construct):
             code=_lambda.DockerImageCode.from_image_asset(
                 directory=directory,
                 file=dockerfile,
+                cmd=cmd,
                 platform=ecr_assets.Platform.LINUX_AMD64,
                 build_args={
                     **build_args,

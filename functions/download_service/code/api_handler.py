@@ -1,4 +1,4 @@
-from code.environment import SERVICE_NAME
+from code.environment import CORS_ORIGINS, SERVICE_NAME
 from code.routes import router
 from typing import Any
 
@@ -22,7 +22,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

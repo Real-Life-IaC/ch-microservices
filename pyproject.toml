@@ -16,6 +16,7 @@ python = "^3.11"
 aws-cdk-lib = "^2.141.0"
 constructs-package = {git = "https://github.com/Real-Life-IaC/cdk-constructs.git", rev = "0.7.1"}
 alembic = "^1.14.0"
+awscli-local = "^0.22.0"
 
 [tool.poetry.group.test]
 optional = true

@@ -10,8 +10,7 @@ from typing import ClassVar, cast
 
 import boto3
 from mypy_boto3_s3 import S3Client
-from pydantic import BaseModel
-from pydantic.networks import EmailStr
+from pydantic import BaseModel, EmailStr
 from sqlmodel import DateTime, Field
 
 
@@ -27,6 +26,7 @@ class Download(UuidModel, table=True):
     email: EmailStr = Field(
         title="Email address",
         description="The email of the person who requested the download",
+        index=True,
     )
 
     name: str = Field(

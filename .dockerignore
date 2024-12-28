@@ -1,7 +1,6 @@
-.dockerignore
-Dockerfile*
-docker-compose
-.venv
-tests
-README.md
-Makefile
+*
+!code
+!alembic.ini
+!poetry.lock
+!pyproject.toml
+!poetry.toml

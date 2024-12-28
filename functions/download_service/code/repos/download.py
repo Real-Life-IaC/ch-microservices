@@ -2,6 +2,7 @@ import datetime as dt
 from code.environment import BACKOFF_SECONDS, SERVICE_NAME
 from code.eventbridge import EventBridge
 from code.models import Download, DownloadCreate, DownloadStatistics
+from uuid import UUID
 
 from aws_lambda_powertools import Logger, Tracer
 from fastapi import HTTPException, status
@@ -23,30 +24,30 @@ class DownloadRepo:
         self.__event_prefix = "book"
 
     @tracer.capture_method(capture_response=False)
-    async def get(self, token: str) -> Download:
+    async def get(self, token: UUID) -> Download:
         """Get a new book download link"""
 
         current_timestamp = dt.datetime.now(tz=dt.UTC)
-        stmt = select(Download).where(Download.id.hex == token)
+        stmt = select(Download).where(Download.id == token)
         result = await self.__session.execute(stmt)
         record = result.scalars().one_or_none()
 
         if not record:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Invalid link. Please request a new one.",
+                detail="Invalid link.",
             )
 
         if record.is_downloaded:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Link already used. Please request a new one.",
+                detail="Link already used.",
             )
 
         if current_timestamp > record.expires_at:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Link expired. Please request a new one.",
+                detail="Link expired.",
             )
 
         record.downloaded_at = current_timestamp
@@ -59,7 +60,7 @@ class DownloadRepo:
         await self.__eventbridge.put_event(
             source=self.__event_source,
             prefix=self.__event_prefix,
-            type="completed",
+            type="downloaded",
             detail=record.model_dump_json(),
         )
 

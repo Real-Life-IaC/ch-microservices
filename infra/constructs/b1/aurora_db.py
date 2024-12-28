@@ -32,8 +32,6 @@ class B1AuroraDB(Construct):
         self,
         scope: Construct,
         id: str,
-        vpc: ec2.IVpc,
-        security_group: ec2.SecurityGroup,
         subscription_teams: list[str],
         service_name: str,
         database_name: str,
@@ -53,8 +51,6 @@ class B1AuroraDB(Construct):
         ----
             scope (cdk.Construct): Parent of this construct
             id (str): Identifier for this construct
-            vpc (ec2.IVpc): VPC to place the database
-            security_group (ec2.SecurityGroup): Security group for the database
             subscription_teams (list[str]): List of teams to subscribe to the alarm
             service_name (str): Name of the service
             database_name (str): Name of the database
@@ -73,6 +69,22 @@ class B1AuroraDB(Construct):
 
         self.database_name = database_name
 
+        vpc = ec2.Vpc.from_lookup(
+            scope=self,
+            id="Vpc",
+            vpc_id=ssm.StringParameter.value_from_lookup(
+                scope=self,
+                parameter_name="/platform/vpc/id",
+            ),
+        )
+
+        self.security_group = ec2.SecurityGroup(
+            scope=self,
+            id="SecurityGroup",
+            vpc=vpc,
+            description="Security group for the database",
+        )
+
         # CIDR block of the VPN
         vpn_cidr_block = ssm.StringParameter.value_for_string_parameter(
             scope=self,
@@ -80,12 +92,12 @@ class B1AuroraDB(Construct):
         )
 
         # Add ingress rules to the security group
-        security_group.connections.allow_from(
-            other=security_group,
+        self.security_group.connections.allow_from(
+            other=self.security_group,
             port_range=ec2.Port.tcp(port),
             description="Allow access to the database from the same security group",
         )
-        security_group.add_ingress_rule(
+        self.security_group.add_ingress_rule(
             peer=ec2.Peer.ipv4(vpn_cidr_block),
             connection=ec2.Port.tcp(port),
             description="Allow access to the database from VPN",
@@ -133,7 +145,7 @@ class B1AuroraDB(Construct):
             cloudwatch_logs_retention=log_retention,
             credentials=self.credentials,
             default_database_name=self.database_name,
-            deletion_protection=True,
+            deletion_protection=False,  # Usually true in real-life
             iam_authentication=True,
             parameter_group=parameter_group,
             port=port,
@@ -141,7 +153,7 @@ class B1AuroraDB(Construct):
             removal_policy=cdk.RemovalPolicy.DESTROY,
             serverless_v2_max_capacity=max_capacity,
             serverless_v2_min_capacity=min_capacity,
-            security_groups=[security_group],
+            security_groups=[self.security_group],
             storage_encrypted=True,
             storage_encryption_key=kms_key,
             storage_type=rds.DBClusterStorageType.AURORA,
@@ -155,7 +167,8 @@ class B1AuroraDB(Construct):
                     auto_minor_version_upgrade=True,
                     enable_performance_insights=False,
                     publicly_accessible=False,
-                    scale_with_writer=idx == 0,  # It is recommended that at least one reader has `scaleWithWriter` set to true
+                    # It is recommended that at least one reader has `scaleWithWriter` set to true
+                    scale_with_writer=idx == 0,
                 )
                 for idx in range(num_reader_instances)
             ],
@@ -197,7 +210,7 @@ class B1AuroraDB(Construct):
             id="ClusterSecurityGroupIdParameter",
             parameter_name=f"/{service_name}/storage/cluster/security-group/id",
             description="API Database Cluster Security Group Id",
-            string_value=security_group.security_group_id,
+            string_value=self.security_group.security_group_id,
         )
 
         # Alarm if available memory is below 256mb in 5/15 of 1 minute periods

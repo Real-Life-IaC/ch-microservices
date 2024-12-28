@@ -4,33 +4,9 @@
             "file": "/Microservices-production.template.json",
             "findings": [
                 {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApiANY4B671C35",
+                    "resource": "AWS::ApiGatewayV2::Stage.RestHttpApiDefaultStageB1763296",
                     "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApidocsGETA08CBA1A",
-                    "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApiopenapijsonGETFDC0E1B8",
-                    "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApiproxyANYD74595DE",
-                    "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Stage.DownloadServiceApiDeploymentStageproductionF77FD643",
-                    "check_ids": [
-                        "CKV_AWS_120"
+                        "CKV_AWS_95"
                     ]
                 },
                 {
@@ -40,7 +16,7 @@
                     ]
                 },
                 {
-                    "resource": "AWS::IAM::Policy.EmailServiceLambdaFunctionServiceRoleDefaultPolicyE608434C",
+                    "resource": "AWS::IAM::Policy.EmailServiceEventsLambdaFunctionServiceRoleDefaultPolicy2F1E71B5",
                     "check_ids": [
                         "CKV_AWS_111"
                     ]
@@ -59,13 +35,19 @@
                     ]
                 },
                 {
-                    "resource": "AWS::Lambda::Function.DownloadServiceLambdaFunction331B39CE",
+                    "resource": "AWS::Lambda::Function.DownloadServiceApiLambdaFunctionCA18871D",
                     "check_ids": [
                         "CKV_AWS_115"
                     ]
                 },
                 {
-                    "resource": "AWS::Lambda::Function.EmailServiceLambdaFunctionE5B60DAB",
+                    "resource": "AWS::Lambda::Function.EmailServiceApiLambdaFunction37E8A0E1",
+                    "check_ids": [
+                        "CKV_AWS_115"
+                    ]
+                },
+                {
+                    "resource": "AWS::Lambda::Function.EmailServiceEventsLambdaFunctionB395B436",
                     "check_ids": [
                         "CKV_AWS_115"
                     ]
@@ -83,33 +65,9 @@
             "file": "/Microservices-sandbox.template.json",
             "findings": [
                 {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApiANY4B671C35",
+                    "resource": "AWS::ApiGatewayV2::Stage.RestHttpApiDefaultStageB1763296",
                     "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApidocsGETA08CBA1A",
-                    "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApiopenapijsonGETFDC0E1B8",
-                    "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApiproxyANYD74595DE",
-                    "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Stage.DownloadServiceApiDeploymentStagesandbox405359E9",
-                    "check_ids": [
-                        "CKV_AWS_120"
+                        "CKV_AWS_95"
                     ]
                 },
                 {
@@ -119,7 +77,7 @@
                     ]
                 },
                 {
-                    "resource": "AWS::IAM::Policy.EmailServiceLambdaFunctionServiceRoleDefaultPolicyE608434C",
+                    "resource": "AWS::IAM::Policy.EmailServiceEventsLambdaFunctionServiceRoleDefaultPolicy2F1E71B5",
                     "check_ids": [
                         "CKV_AWS_111"
                     ]
@@ -138,13 +96,19 @@
                     ]
                 },
                 {
-                    "resource": "AWS::Lambda::Function.DownloadServiceLambdaFunction331B39CE",
+                    "resource": "AWS::Lambda::Function.DownloadServiceApiLambdaFunctionCA18871D",
                     "check_ids": [
                         "CKV_AWS_115"
                     ]
                 },
                 {
-                    "resource": "AWS::Lambda::Function.EmailServiceLambdaFunctionE5B60DAB",
+                    "resource": "AWS::Lambda::Function.EmailServiceApiLambdaFunction37E8A0E1",
+                    "check_ids": [
+                        "CKV_AWS_115"
+                    ]
+                },
+                {
+                    "resource": "AWS::Lambda::Function.EmailServiceEventsLambdaFunctionB395B436",
                     "check_ids": [
                         "CKV_AWS_115"
                     ]
@@ -162,33 +126,9 @@
             "file": "/Microservices-staging.template.json",
             "findings": [
                 {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApiANY4B671C35",
+                    "resource": "AWS::ApiGatewayV2::Stage.RestHttpApiDefaultStageB1763296",
                     "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApidocsGETA08CBA1A",
-                    "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApiopenapijsonGETFDC0E1B8",
-                    "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Method.DownloadServiceApiproxyANYD74595DE",
-                    "check_ids": [
-                        "CKV_AWS_59"
-                    ]
-                },
-                {
-                    "resource": "AWS::ApiGateway::Stage.DownloadServiceApiDeploymentStagestaging19AA27C0",
-                    "check_ids": [
-                        "CKV_AWS_120"
+                        "CKV_AWS_95"
                     ]
                 },
                 {
@@ -198,7 +138,7 @@
                     ]
                 },
                 {
-                    "resource": "AWS::IAM::Policy.EmailServiceLambdaFunctionServiceRoleDefaultPolicyE608434C",
+                    "resource": "AWS::IAM::Policy.EmailServiceEventsLambdaFunctionServiceRoleDefaultPolicy2F1E71B5",
                     "check_ids": [
                         "CKV_AWS_111"
                     ]
@@ -217,13 +157,19 @@
                     ]
                 },
                 {
-                    "resource": "AWS::Lambda::Function.DownloadServiceLambdaFunction331B39CE",
+                    "resource": "AWS::Lambda::Function.DownloadServiceApiLambdaFunctionCA18871D",
                     "check_ids": [
                         "CKV_AWS_115"
                     ]
                 },
                 {
-                    "resource": "AWS::Lambda::Function.EmailServiceLambdaFunctionE5B60DAB",
+                    "resource": "AWS::Lambda::Function.EmailServiceApiLambdaFunction37E8A0E1",
+                    "check_ids": [
+                        "CKV_AWS_115"
+                    ]
+                },
+                {
+                    "resource": "AWS::Lambda::Function.EmailServiceEventsLambdaFunctionB395B436",
                     "check_ids": [
                         "CKV_AWS_115"
                     ]

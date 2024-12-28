@@ -1,16 +1,14 @@
 from aws_cdk import (
     aws_ec2 as ec2,
     aws_events as events,
-    aws_route53 as route53,
     aws_ssm as ssm,
 )
 from constructs import Construct
 
+from infra.constructs.b1.api_gateway import B1ApiGateway
 from infra.constructs.b1.aurora_db import B1AuroraDB
 from infra.constructs.b1.bucket import B1Bucket
 from infra.constructs.b1.docker_lambda import B1DockerLambdaFunction
-from infra.constructs.b1.firewall import B1ApiGatewayFirewall
-from infra.constructs.b1.lambda_api import B1LambdaApi
 
 
 class B2DownloadService(Construct):
@@ -20,20 +18,14 @@ class B2DownloadService(Construct):
         self,
         scope: Construct,
         id: str,
-        domain_name: str,
-        hosted_zone_type: str | None = None,
+        subscription_teams: list[str],
+        service_name: str,
+        api_gateway: B1ApiGateway,
+        aurora_db: B1AuroraDB,
     ) -> None:
         super().__init__(scope, id)
 
-        service_name = "download"
-        subscription_teams = ["platform"]
         ebook_object_key = "real-life-iac-with-aws-cdk.pdf"
-        hosted_zone_type = hosted_zone_type or "private"
-
-        stage = ssm.StringParameter.value_from_lookup(
-            scope=self,
-            parameter_name="/platform/stage",
-        )
 
         vpc = ec2.Vpc.from_lookup(
             scope=self,
@@ -41,19 +33,6 @@ class B2DownloadService(Construct):
             vpc_id=ssm.StringParameter.value_from_lookup(
                 scope=self,
                 parameter_name="/platform/vpc/id",
-            ),
-        )
-
-        hosted_zone = route53.HostedZone.from_hosted_zone_attributes(
-            scope=self,
-            id="HostedZone",
-            hosted_zone_id=ssm.StringParameter.value_for_string_parameter(
-                scope=self,
-                parameter_name=f"/platform/dns/{domain_name}/{hosted_zone_type}-hosted-zone/id",
-            ),
-            zone_name=ssm.StringParameter.value_for_string_parameter(
-                scope=self,
-                parameter_name=f"/platform/dns/{domain_name}/{hosted_zone_type}-hosted-zone/name",
             ),
         )
 
@@ -66,69 +45,46 @@ class B2DownloadService(Construct):
             ),
         )
 
-        security_group = ec2.SecurityGroup(
+        self.security_group = ec2.SecurityGroup(
             scope=self,
             id="SecurityGroup",
             vpc=vpc,
             description="Security group for the download service",
         )
 
-        aurora_db = B1AuroraDB(
-            scope=self,
-            id="AuroraDb",
-            vpc=vpc,
-            security_group=security_group,
-            subscription_teams=subscription_teams,
-            service_name=service_name,
-            database_name="download",
-        )
-
         bucket = B1Bucket(
             scope=self,
             id="Bucket",
-            service_name=service_name,
+            service_name=f"{service_name}/bucket",
         )
 
-        docker_lambda = B1DockerLambdaFunction(
+        # Lambda to handle API requests
+        api_lambda = B1DockerLambdaFunction(
             scope=self,
-            id="Lambda",
+            id="ApiLambda",
             timeout_seconds=30,
             memory_size=256,
             directory="functions/download_service",
             dockerfile="Dockerfile.lambda",
-            service_name=service_name,
+            cmd=["code.api_handler.handler"],
+            service_name=f"{service_name}/api/lambda",
             subscription_teams=subscription_teams,
             vpc=vpc,
-            security_group=security_group,
+            security_group=self.security_group,
             environment_vars={
                 "EVENT_BUS_NAME": event_bus.event_bus_name,
                 "DB_SECRET_NAME": aurora_db.credentials.secret_name,
                 "BUCKET_NAME": bucket.bucket_name,
                 "EBOOK_OBJECT_KEY": ebook_object_key,
-                "FRONTEND_URL": f"{hosted_zone.zone_name}",
+                "FRONTEND_URL": api_gateway.hosted_zone.zone_name,
+                "CORS_ORIGINS": ",".join(api_gateway.cors_options.allow_origins),
             },
         )
 
-        aurora_db.cluster.secret.grant_read(docker_lambda.function)
-        bucket.grant_read(docker_lambda.function, objects_key_pattern=ebook_object_key)
-        event_bus.grant_put_events_to(docker_lambda.function)
+        aurora_db.security_group.add_ingress_rule(peer=self.security_group, connection=ec2.Port.tcp(5432))
 
-        lambda_api = B1LambdaApi(
-            scope=self,
-            id="Api",
-            function=docker_lambda.function,
-            service_name=service_name,
-            subscription_teams=subscription_teams,
-            domain_name=domain_name,
-            subdomain_name="api",
-            hosted_zone_type=hosted_zone_type,
-        )
+        aurora_db.cluster.secret.grant_read(api_lambda.function)
+        bucket.grant_read(api_lambda.function, objects_key_pattern=ebook_object_key)
+        event_bus.grant_put_events_to(api_lambda.function)
 
-        if stage == "production":
-            firewall = B1ApiGatewayFirewall(
-                scope=self,
-                id="Firewall",
-                service_name=service_name,
-            )
-
-            firewall.web_acl.associate(api=lambda_api.api)
+        api_gateway.add_lambda_route(path="download", handler=api_lambda.function)

@@ -4,6 +4,7 @@ from code.eventbridge import EventBridge, get_eventbridge
 from code.models import DownloadCreate, DownloadResponse, DownloadStatistics
 from code.repos.download import DownloadRepo
 from typing import Annotated
+from uuid import UUID
 
 from aws_lambda_powertools import Logger, Tracer
 from fastapi import (
@@ -19,35 +20,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 logger = Logger(service=SERVICE_NAME)
 tracer = Tracer(service=SERVICE_NAME)
 
-router = APIRouter()
+router = APIRouter(prefix="/download")
 
 
-@router.get("/download/{token}", response_model=DownloadResponse)
-async def download_book(
-    session: Annotated[AsyncSession, Depends(get_session)],
-    eventbridge: Annotated[EventBridge, Depends(get_eventbridge)],
-    token: Annotated[str, Path(description="Token to download the file")],
-) -> DownloadResponse:
-    """Exchange a token for a presigned URL to download the book"""
-
-    download_repo = DownloadRepo(session=session, eventbridge=eventbridge)
-    download = await download_repo.get(token)
-
-    return DownloadResponse(url=download.presigned_url)
-
-
-@router.post("/request", status_code=status.HTTP_201_CREATED)
-async def request_book(
-    session: Annotated[AsyncSession, Depends(get_session)],
-    eventbridge: Annotated[EventBridge, Depends(get_eventbridge)],
-    body: Annotated[DownloadCreate, Body(description="Download request details")],
-) -> None:
-    """Request a book copy by giving email and name"""
-
-    download_repo = DownloadRepo(session=session, eventbridge=eventbridge)
-    await download_repo.request(new=body)
-
-
+# The order of the routes is important
+# FastAPI processes routes in the order they are defined, so static paths should come first.
 @router.get("/statistics")
 async def download_statistics(
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -55,5 +32,31 @@ async def download_statistics(
 ) -> DownloadStatistics:
     """Get the statistics of number of requested and downloaded ebooks"""
 
-    download_repo = DownloadRepo(session=session, eventbridge=eventbridge)
-    return await download_repo.get_statistics()
+    repo = DownloadRepo(session=session, eventbridge=eventbridge)
+    return await repo.get_statistics()
+
+
+@router.get("/{token}", response_model=DownloadResponse)
+async def download_book(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    eventbridge: Annotated[EventBridge, Depends(get_eventbridge)],
+    token: Annotated[UUID, Path(description="Token to download the file")],
+) -> DownloadResponse:
+    """Exchange a token for a presigned URL to download the book"""
+
+    repo = DownloadRepo(session=session, eventbridge=eventbridge)
+    download = await repo.get(token)
+
+    return DownloadResponse(url=download.presigned_url)
+
+
+@router.post("", status_code=status.HTTP_201_CREATED)
+async def request_book(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    eventbridge: Annotated[EventBridge, Depends(get_eventbridge)],
+    body: Annotated[DownloadCreate, Body(description="Download request details")],
+) -> None:
+    """Request a book copy by giving email and name"""
+
+    repo = DownloadRepo(session=session, eventbridge=eventbridge)
+    await repo.request(new=body)
