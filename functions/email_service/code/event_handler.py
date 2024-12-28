@@ -21,24 +21,22 @@ tracer = Tracer(service=SERVICE_NAME)
 async def process(parsed_event: EventBridgeEvent) -> None:
     """Process events."""
 
-    eventbridge = await anext(get_eventbridge())
-    ses = await anext(get_ses())
-    session = await anext(get_session())
+    async with get_eventbridge() as eventbridge, get_ses() as ses, get_session() as session:
 
-    book_request_repo = BookRequestRepo(eventbridge=eventbridge, ses=ses)
-    mailing_repo = MailingRepo(eventbridge=eventbridge, session=session)
+        book_request_repo = BookRequestRepo(eventbridge=eventbridge, ses=ses)
+        mailing_repo = MailingRepo(eventbridge=eventbridge, session=session)
 
-    if parsed_event.detail_type == "book.requested":
-        await book_request_repo.send(BookRequest(**parsed_event.detail))
-        await mailing_repo.create(new=Mailing(**parsed_event.detail))
+        if parsed_event.detail_type == "book.requested":
+            await book_request_repo.send(BookRequest(**parsed_event.detail))
+            await mailing_repo.create(new=Mailing(**parsed_event.detail))
 
-    elif parsed_event.detail_type == "book.downloaded":
-        await mailing_repo.validate(email=parsed_event.detail["email"])
+        elif parsed_event.detail_type == "book.downloaded":
+            await mailing_repo.validate(email=parsed_event.detail["email"])
 
-    else:
-        msg = "Unhandled event type"
-        logger.exception("Unhandled event type", event_type=parsed_event.detail_type)
-        raise RuntimeError(msg)
+        else:
+            msg = "Unhandled event type"
+            logger.exception("Unhandled event type", event_type=parsed_event.detail_type)
+            raise RuntimeError(msg)
 
 
 @logger.inject_lambda_context(log_event=True)

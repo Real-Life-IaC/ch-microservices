@@ -1,5 +1,6 @@
 from code.environment import LOCALSTACK_ENDPOINT, SERVICE_NAME
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 from typing import cast
 
 import boto3
@@ -57,6 +58,7 @@ class Ses:
         return response["MessageId"]
 
 
+@asynccontextmanager
 async def get_ses() -> AsyncGenerator[Ses]:
     """Get Ses instance."""
     yield Ses()

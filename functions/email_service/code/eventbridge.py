@@ -1,5 +1,6 @@
 from code.environment import EVENT_BUS_NAME, LOCALSTACK_ENDPOINT, SERVICE_NAME
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 from typing import cast
 
 import boto3
@@ -64,6 +65,7 @@ class EventBridge:
         return event_id
 
 
+@asynccontextmanager
 async def get_eventbridge() -> AsyncGenerator[EventBridge]:
     """Get EventBridge instance."""
     yield EventBridge()
