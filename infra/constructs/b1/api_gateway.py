@@ -120,7 +120,6 @@ class B1ApiGateway(Construct):
         log_group = logs.LogGroup(
             scope=self,
             id="LogGroup",
-            log_group_name=f"/{service_name}/http-api/log-group",
             retention=logs.RetentionDays.ONE_MONTH,
         )
 
