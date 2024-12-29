@@ -104,6 +104,7 @@ class B2EmailService(Construct):
             subscription_teams=subscription_teams,
             vpc=vpc,
             security_group=self.security_group,
+            dead_letter_queue_enabled=True,
             environment_vars={
                 "EVENT_BUS_NAME": event_bus.event_bus_name,
                 "DB_SECRET_NAME": aurora_db.credentials.secret_name,
