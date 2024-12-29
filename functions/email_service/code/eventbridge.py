@@ -65,7 +65,9 @@ class EventBridge:
         return event_id
 
 
-@asynccontextmanager
 async def get_eventbridge() -> AsyncGenerator[EventBridge]:
     """Get EventBridge instance."""
     yield EventBridge()
+
+
+get_eventbridge_context = asynccontextmanager(get_eventbridge)

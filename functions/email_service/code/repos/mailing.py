@@ -1,7 +1,7 @@
 import datetime as dt
 from code.environment import SERVICE_NAME
 from code.eventbridge import EventBridge
-from code.models import Mailing
+from code.models import Mailing, MailingCreate
 
 from aws_lambda_powertools import Logger, Tracer
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,7 +24,7 @@ class MailingRepo:
     @tracer.capture_method(capture_response=False)
     async def create(
         self,
-        new: Mailing,
+        new: MailingCreate,
     ) -> Mailing:
         """Create a new Mailing deduplicated by email"""
 
@@ -37,7 +37,7 @@ class MailingRepo:
             return record
 
         logger.info("Creating new Mailing", Mailing=new.model_dump_json())
-        self.__session.add(new)
+        self.__session.add(Mailing(**new.model_dump()))
 
         await self.__session.commit()
         await self.__eventbridge.put_event(

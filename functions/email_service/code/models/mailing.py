@@ -2,7 +2,7 @@ import datetime as dt
 from code.models.base import UuidModel
 from typing import ClassVar
 
-from pydantic import EmailStr
+from pydantic import BaseModel, EmailStr
 from sqlmodel import DateTime, Field
 
 
@@ -49,3 +49,10 @@ class Mailing(UuidModel, table=True):
         description="The date and time when the user unsubscribed from the mailing list",
         default=None,
     )
+
+
+class MailingCreate(BaseModel):
+    """Mailing model"""
+
+    email: EmailStr
+    name: str

@@ -1,5 +1,6 @@
 from code.environment import DB_SECRET_NAME, SERVICE_NAME
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
 from aws_lambda_powertools import Logger, Tracer
 from aws_lambda_powertools.utilities.parameters import GetParameterError, get_secret
@@ -55,3 +56,6 @@ async def get_session() -> AsyncGenerator[AsyncSession]:
             yield session
         finally:
             await session.close()
+
+
+session_context = asynccontextmanager(get_session)

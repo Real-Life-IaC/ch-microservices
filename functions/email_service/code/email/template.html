@@ -46,8 +46,8 @@
       .button {
         display: inline-block;
         background-color: #DB4F40;
-        color: #ffffff;
-        text-decoration: none;
+        color: #ffffff !important;
+        text-decoration: none !important;
         font-size: 16px;
         font-weight: bold;
         padding: 18px 30px;
@@ -56,26 +56,10 @@
         margin-bottom: 16px;
       }
 
-      .button:hover {
+      .button:hover{
         background-color: #ed6f63;
-        color: #ffffff;
-        text-decoration: none;
-      }
-
-      /* Explicitly handle link states */
-      .button:link,
-      .button:visited {
-        color: #ffffff; /* White text for unvisited and visited links */
-      }
-
-      .button:hover {
-        color: #ffffff; /* Keep text white on hover */
-        background-color: #C64537; /* Slightly darker background on hover */
-      }
-
-      .button:active {
-        color: #ffffff; /* White text on active */
-        background-color: #B53D31; /* Darker background for active state */
+        color: #ffffff !important;
+        text-decoration: none !important;;
       }
 
       .email-footer {
@@ -111,13 +95,14 @@
         <p>
           You can download your eBook by clicking the button below:
         </p>
-        <a href="{{file_link}}" target="_blank" class="button">Download eBook</a>
+        <a href="{{file_link}}" target="_blank" class="button" style="color: #ffffff !important;">Download eBook</a>
         <p>
           Or copy and paste the following link into your browser:
         </p>
         <p>
-          <a href="{{file_link}}" target="_blank">{{file_link}}</a>
+          <a href="{{file_link}}" target="_blank" >{{file_link}}</a>
         </p>
+        <p> <b>Hurry! The link expires in 48 hours!</b></p>
       </div>
 
       <!-- Footer -->
@@ -125,9 +110,9 @@
         <p>
           You are receiving this email because you signed up to receive a copy of
           my book, <strong>Real-Life Infrastructure as Code with AWS CDK</strong>
-          on <a href=https:/real-life-iac.com>https:/real-life-iac.com</a></p>
+          on <a href=https://real-life-iac.com>https://real-life-iac.com</a></p>
           <p>If you no longer wish to receive emails from me, you can
-        <a href="https:/real-life-iac.com/email/unsubscribe/{{email}}" target="_blank">Unsubscribe.</a> </p>
+        <a href="https://real-life-iac.com/email/unsubscribe/{{email}}" target="_blank">Unsubscribe.</a> </p>
        </div>
     </div>
   </body>

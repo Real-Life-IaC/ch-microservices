@@ -44,16 +44,20 @@ engine = create_async_engine(
 )
 
 
-@asynccontextmanager
-async def get_session() -> AsyncGenerator[AsyncSession]:
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
     """Yield a Session instance"""
+
     async_session = sessionmaker(
         bind=engine,
         class_=AsyncSession,
         expire_on_commit=False,
     )
+
     async with async_session() as session:
         try:
             yield session
         finally:
             await session.close()
+
+
+get_session_context = asynccontextmanager(get_session)

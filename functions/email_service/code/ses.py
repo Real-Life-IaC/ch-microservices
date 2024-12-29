@@ -58,7 +58,9 @@ class Ses:
         return response["MessageId"]
 
 
-@asynccontextmanager
 async def get_ses() -> AsyncGenerator[Ses]:
     """Get Ses instance."""
     yield Ses()
+
+
+get_ses_context = asynccontextmanager(get_ses)

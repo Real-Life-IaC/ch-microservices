@@ -1,11 +1,11 @@
 import asyncio
-from code.db import get_session
+from code.db import get_session_context
 from code.environment import SERVICE_NAME
-from code.eventbridge import get_eventbridge
-from code.models import BookRequest, Mailing
+from code.eventbridge import get_eventbridge_context
+from code.models import BookRequest, MailingCreate
 from code.repos.book_request import BookRequestRepo
 from code.repos.mailing import MailingRepo
-from code.ses import get_ses
+from code.ses import get_ses_context
 from typing import Any
 
 from aws_lambda_powertools import Logger, Tracer
@@ -21,14 +21,14 @@ tracer = Tracer(service=SERVICE_NAME)
 async def process(parsed_event: EventBridgeEvent) -> None:
     """Process events."""
 
-    async with get_eventbridge() as eventbridge, get_ses() as ses, get_session() as session:
+    async with get_eventbridge_context() as eventbridge, get_ses_context() as ses, get_session_context() as session:
 
         book_request_repo = BookRequestRepo(eventbridge=eventbridge, ses=ses)
         mailing_repo = MailingRepo(eventbridge=eventbridge, session=session)
 
         if parsed_event.detail_type == "book.requested":
             await book_request_repo.send(BookRequest(**parsed_event.detail))
-            await mailing_repo.create(new=Mailing(**parsed_event.detail))
+            await mailing_repo.create(new=MailingCreate(**parsed_event.detail))
 
         elif parsed_event.detail_type == "book.downloaded":
             await mailing_repo.validate(email=parsed_event.detail["email"])
