@@ -1,0 +1,100 @@
+---
+services:
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME:-localstack-main}"
+    image: localstack/localstack-pro
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+      - "127.0.0.1:443:443"              # LocalStack HTTPS Gateway (Pro)
+    environment:
+      DEBUG: 1
+      PERSISTENCE: 1
+      LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:?}  # required for Pro
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: unless-stopped
+    healthcheck:
+      test: curl --fail http://localhost:4566 || exit 1
+      interval: 60s
+      retries: 30
+      start_period: 20s
+      timeout: 120s
+
+  postgres-db:
+    image: postgres:16.2
+    user: postgres
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "postgres" ]
+      interval: 30s
+      timeout: 120s
+      retries: 15
+      start_period: 20s
+  download_service:
+    container_name: download_service
+    build:
+      context: ./functions/download_service
+      dockerfile: Dockerfile.local
+    volumes:
+      - "./functions/download_service:/home/code"
+      - "./functions/download_service/.venv.docker:/home/code/.venv"
+    ports:
+      - 5001:5001
+    environment:
+      - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+    depends_on:
+      - localstack
+      - postgres-db
+    restart: unless-stopped
+    healthcheck:
+      test: curl --fail http://localhost:5001/health || exit 1
+      interval: 60s
+      retries: 30
+      start_period: 20s
+      timeout: 120s
+
+  email_service:
+    container_name: email_service
+    build:
+      context: ./functions/email_service
+      dockerfile: Dockerfile.local
+    volumes:
+      - "./functions/email_service:/home/code"
+      - "./functions/email_service/.venv.docker:/home/code/.venv"
+    ports:
+      - 5002:5002
+    environment:
+      - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+    depends_on:
+      - localstack
+      - postgres-db
+    restart: unless-stopped
+    healthcheck:
+      test: curl --fail http://localhost:5002/health || exit 1
+      interval: 60s
+      retries: 30
+      start_period: 20s
+      timeout: 120s
+
+
+volumes:
+  postgres-db-volume:
+    driver: local

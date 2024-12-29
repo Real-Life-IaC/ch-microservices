@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      /* General Styles */
+      body {
+        font-family: sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+      }
+
+      .email-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ddd;
+      }
+
+      .email-header {
+        background-color: #DB4F40;
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .email-header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .email-body {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .email-body p {
+        margin: 15px 0;
+      }
+
+      .button {
+        display: inline-block;
+        background-color: #DB4F40;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 18px 30px;
+        border-radius: 12px;
+        margin-top: 8px;
+        margin-bottom: 16px;
+      }
+
+      .button:hover{
+        background-color: #ed6f63;
+        color: #ffffff !important;
+        text-decoration: none !important;;
+      }
+
+      .email-footer {
+        background-color: #f1f1f1;
+        color: #666;
+        font-size: 12px;
+        padding: 15px 20px;
+        text-align: center;
+      }
+
+      .email-footer a {
+        color: #4a90e2;
+        text-decoration: none;
+      }
+
+      .email-footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <h1>Your eBook is Ready!</h1>
+      </div>
+
+      <div class="email-body">
+        <p>Hi {{name}},</p>
+        <p>
+          Thank you for signing up for a copy of <strong>Real-Life
+          Infrastructure as Code with AWS CDK</strong>.
+        </p>
+        <p>
+          You can download your eBook by clicking the button below:
+        </p>
+        <a href="{{file_link}}" target="_blank" class="button" style="color: #ffffff !important;">Download eBook</a>
+        <p>
+          Or copy and paste the following link into your browser:
+        </p>
+        <p>
+          <a href="{{file_link}}" target="_blank" >{{file_link}}</a>
+        </p>
+        <p> <b>Hurry! The link expires in 48 hours!</b></p>
+      </div>
+
+      <!-- Footer -->
+      <div class="email-footer">
+        <p>
+          You are receiving this email because you signed up to receive a copy of
+          my book, <strong>Real-Life Infrastructure as Code with AWS CDK</strong>
+          on <a href=https://real-life-iac.com>https://real-life-iac.com</a></p>
+          <p>If you no longer wish to receive emails from me, you can
+        <a href="https://real-life-iac.com/email/unsubscribe/{{email}}" target="_blank">Unsubscribe.</a> </p>
+       </div>
+    </div>
+  </body>
+</html>

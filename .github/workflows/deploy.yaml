@@ -31,7 +31,7 @@ jobs:
         with:
           role-to-assume: ${{ vars.ROLE_TO_ASSUME }}
           aws-region: ${{ vars.AWS_REGION }}
-          stack-name: Api-sandbox
+          stack-name: Microservices-sandbox
 
   deploy-staging:
     if: github.ref_name == 'main'
@@ -47,7 +47,7 @@ jobs:
         with:
           role-to-assume: ${{ vars.ROLE_TO_ASSUME }}
           aws-region: ${{ vars.AWS_REGION }}
-          stack-name: Api-staging
+          stack-name: Microservices-staging
 
   deploy-production:
     if: github.ref_name == 'main'
@@ -66,4 +66,4 @@ jobs:
         with:
           role-to-assume: ${{ vars.ROLE_TO_ASSUME }}
           aws-region: ${{ vars.AWS_REGION }}
-          stack-name: Api-production
+          stack-name: Microservices-production

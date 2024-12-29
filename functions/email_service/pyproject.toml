@@ -1,0 +1,63 @@
+[tool.poetry]
+name = "email-service"
+version = "0.0.0"
+description = "Email management service"
+authors = ["Andre Sionek <andre@real-life-iac.com>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aws-lambda-powertools = {version = "^3.2.0", extras = ["tracer"]}
+fastapi = "^0.104.1"
+uvicorn = {version = "^0.24.0.post1", extras = ["standard"]}
+mangum = "^0.17.0"
+boto3 = "^1.33.6"
+pydantic = {extras = ["email"], version = "^2.6.1"}
+mypy-boto3-events = "^1.34.17"
+mypy-boto3-ses = "^1.35.68"
+jinja2 = "^3.1.5"
+sqlmodel = "^0.0.22"
+alembic = "^1.14.0"
+sqlalchemy = "^2.0.32"
+asyncpg = "^0.29.0"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.2.0"          # Allows for testing of the project
+pytest-cov = "^4.1.0"      # Allows to run coverage of the project
+pytest-mock = "^3.14.0"    # Allows mocking in tests
+pytest-asyncio = "^0.23.7" # Allows async testing
+moto = {extras = ["all"], version = "^5.0.7"}
+freezegun = "^1.5.1"
+pytest-xdist = {extras = ["psutil"], version = "^3.6.1"}
+
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.5.0"]
+
+
+[tool.pytest.ini_options]
+addopts = """
+  --numprocesses=auto
+  --dist=worksteal
+  --maxprocesses=4
+  -vv
+  --ignore=functions
+  --ignore=cdk.out
+  --color=yes
+  --cov .
+  --cov-report=term
+  --cov-report=xml
+"""
+minversion = "7.1"
+filterwarnings = [
+  "ignore:Pydantic serializer warnings",
+  "ignore::DeprecationWarning",
+]
+
+
+[tool.coverage.run]
+omit = ["*/tests/*", "*/__init__.py", "*/*config.py"]    # Remove test files from coverage run.

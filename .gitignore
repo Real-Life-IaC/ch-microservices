@@ -358,11 +358,6 @@ fabric.properties
 
 ### VisualStudioCode template
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
 
 # Local History for Visual Studio Code
 .history/
@@ -476,6 +471,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv.docker
 env/
 venv/
 ENV/
