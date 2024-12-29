@@ -48,7 +48,7 @@ addopts = """
   --ignore=functions
   --ignore=cdk.out
   --color=yes
-  --cov
+  --cov .
   --cov-report=term
   --cov-report=xml
 """

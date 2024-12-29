@@ -162,12 +162,11 @@ addopts = """
   --ignore=functions
   --ignore=cdk.out
   --color=yes
-  --cov
+  --cov .
   --cov-report=term
   --cov-report=xml
 """
 minversion = "7.1"
-
 
 [tool.coverage.run]
 omit = ["*/tests/*", "*/__init__.py", "*/*config.py"]    # Remove test files from coverage run.
