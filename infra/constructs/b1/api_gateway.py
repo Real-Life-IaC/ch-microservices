@@ -45,7 +45,7 @@ class B1ApiGateway(Construct):
         throttling_burst_limit: int = 40,
         hosted_zone_type: str | None = None,
         cors_origins: list[str] | None = None,
-        latency_alarm_threshold_ms: int = 1500,
+        latency_alarm_threshold_ms: int = 3000,
         client_error_alarm_threshold: int = 10,
         server_error_alarm_threshold: int = 10,
     ) -> None:
@@ -64,7 +64,7 @@ class B1ApiGateway(Construct):
             throttling_rate_limit (int, optional): The rate limit for the API. Defaults to 20.
             throttling_burst_limit (int, optional): The burst limit for the API. Defaults to 40.
             cors_origins (list[str], optional): List of CORS origins. Defaults to ["*"].
-            latency_alarm_threshold_ms (int, optional): The threshold for the latency alarm in milliseconds. Defaults to 1500.
+            latency_alarm_threshold_ms (int, optional): The threshold for the latency alarm in milliseconds. Defaults to 3000.
             client_error_alarm_threshold (int, optional): The threshold for the client error alarm. Defaults to 10.
             server_error_alarm_threshold (int, optional): The threshold for the server error alarm. Defaults to 10.
 
@@ -88,13 +88,6 @@ class B1ApiGateway(Construct):
             ),
         )
 
-        self.security_group = ec2.SecurityGroup(
-            scope=self,
-            id="SecurityGroup",
-            vpc=vpc,
-            description="Security group for the database",
-        )
-
         self.hosted_zone = route53.HostedZone.from_hosted_zone_attributes(
             scope=self,
             id="HostedZone",
@@ -115,6 +108,13 @@ class B1ApiGateway(Construct):
                 scope=self,
                 parameter_name=f"/platform/dns/{domain_name}/{hosted_zone_type}-hosted-zone/certificate/arn",
             ),
+        )
+
+        self.security_group = ec2.SecurityGroup(
+            scope=self,
+            id="SecurityGroup",
+            vpc=vpc,
+            description="Security group for the API Gateway",
         )
 
         log_group = logs.LogGroup(

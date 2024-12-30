@@ -60,7 +60,7 @@
                     ]
                 },
                 {
-                    "resource": "AWS::SQS::Queue.EmailServiceApiLambdaFunctionDeadLetterQueue7A55E6B1",
+                    "resource": "AWS::SQS::Queue.EmailServiceEventsLambdaFunctionDeadLetterQueue526636FA",
                     "check_ids": [
                         "CKV_AWS_27"
                     ]
@@ -127,7 +127,7 @@
                     ]
                 },
                 {
-                    "resource": "AWS::SQS::Queue.EmailServiceApiLambdaFunctionDeadLetterQueue7A55E6B1",
+                    "resource": "AWS::SQS::Queue.EmailServiceEventsLambdaFunctionDeadLetterQueue526636FA",
                     "check_ids": [
                         "CKV_AWS_27"
                     ]
@@ -194,7 +194,7 @@
                     ]
                 },
                 {
-                    "resource": "AWS::SQS::Queue.EmailServiceApiLambdaFunctionDeadLetterQueue7A55E6B1",
+                    "resource": "AWS::SQS::Queue.EmailServiceEventsLambdaFunctionDeadLetterQueue526636FA",
                     "check_ids": [
                         "CKV_AWS_27"
                     ]

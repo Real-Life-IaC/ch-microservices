@@ -42,6 +42,7 @@ services:
       timeout: 120s
       retries: 15
       start_period: 20s
+
   download_service:
     container_name: download_service
     build:
