@@ -9,6 +9,7 @@ from mypy_boto3_events import EventBridgeClient
 
 
 logger = Logger(service=SERVICE_NAME)
+session = boto3.Session()
 
 
 class EventBridge:
@@ -22,7 +23,7 @@ class EventBridge:
 
         self.client = cast(
             EventBridgeClient,
-            boto3.client(
+            session.client(
                 service_name="events",
                 endpoint_url=LOCALSTACK_ENDPOINT,
             ),

@@ -1,7 +1,5 @@
 import datetime as dt
 from code.environment import (
-    BUCKET_NAME,
-    EBOOK_OBJECT_KEY,
     FRONTEND_URL,
     TOKEN_EXPIRATION_HOURS,
 )
@@ -59,25 +57,12 @@ class Download(UuidModel, table=True):
     presigned_url: str = Field(
         title="Pre-signed URL",
         description="The pre-signed URL to download the file",
-        default_factory=lambda: generate_presigned_url(),
     )
 
     def __init__(self, **data) -> None:
         super().__init__(**data)
         if not self.link:
             self.link = f"{FRONTEND_URL}/download/{self.id.hex}"
-
-
-def generate_presigned_url() -> str:
-    """Generate a pre-signed URL to download the file"""
-    return s3_client.generate_presigned_url(
-        "get_object",
-        Params={
-            "Bucket": BUCKET_NAME,
-            "Key": EBOOK_OBJECT_KEY,
-        },
-        ExpiresIn=TOKEN_EXPIRATION_HOURS * 60 * 60 + 10,  # To seconds + 10 seconds
-    )
 
 
 class DownloadCreate(BaseModel):

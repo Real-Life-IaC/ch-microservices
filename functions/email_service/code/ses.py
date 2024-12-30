@@ -10,6 +10,8 @@ from mypy_boto3_ses import SESClient
 
 logger = Logger(service=SERVICE_NAME)
 
+session = boto3.Session()
+
 
 class Ses:
     """Ses client."""
@@ -22,7 +24,7 @@ class Ses:
 
         self.client = cast(
             SESClient,
-            boto3.client(
+            session.client(
                 service_name="ses",
                 endpoint_url=LOCALSTACK_ENDPOINT,
             ),

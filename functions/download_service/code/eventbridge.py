@@ -1,5 +1,6 @@
 from code.environment import EVENT_BUS_NAME, LOCALSTACK_ENDPOINT, SERVICE_NAME
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 from typing import cast
 
 import boto3
@@ -8,6 +9,7 @@ from mypy_boto3_events import EventBridgeClient
 
 
 logger = Logger(service=SERVICE_NAME)
+session = boto3.Session()
 
 
 class EventBridge:
@@ -21,7 +23,7 @@ class EventBridge:
 
         self.client = cast(
             EventBridgeClient,
-            boto3.client(
+            session.client(
                 service_name="events",
                 endpoint_url=LOCALSTACK_ENDPOINT,
             ),
@@ -67,3 +69,6 @@ class EventBridge:
 async def get_eventbridge() -> AsyncGenerator[EventBridge]:
     """Get EventBridge instance."""
     yield EventBridge()
+
+
+get_eventbridge_context = asynccontextmanager(get_eventbridge)
