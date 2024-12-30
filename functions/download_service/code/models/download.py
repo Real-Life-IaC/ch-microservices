@@ -4,15 +4,10 @@ from code.environment import (
     TOKEN_EXPIRATION_HOURS,
 )
 from code.models.base import UuidModel
-from typing import ClassVar, cast
+from typing import ClassVar
 
-import boto3
-from mypy_boto3_s3 import S3Client
 from pydantic import BaseModel, EmailStr
 from sqlmodel import DateTime, Field
-
-
-s3_client = cast(S3Client, boto3.client("s3"))
 
 
 class Download(UuidModel, table=True):
