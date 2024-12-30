@@ -2,6 +2,7 @@ import datetime as dt
 from code.environment import BACKOFF_SECONDS, SERVICE_NAME
 from code.eventbridge import EventBridge
 from code.models import Download, DownloadCreate, DownloadStatistics
+from code.s3 import S3
 from uuid import UUID
 
 from aws_lambda_powertools import Logger, Tracer
@@ -17,9 +18,10 @@ logger = Logger(service=SERVICE_NAME)
 class DownloadRepo:
     """Download repository"""
 
-    def __init__(self, session: AsyncSession, eventbridge: EventBridge) -> None:
+    def __init__(self, session: AsyncSession, eventbridge: EventBridge, s3: S3) -> None:
         self.__session = session
         self.__eventbridge = eventbridge
+        self.__s3 = s3
         self.__event_source = "downloadService"
         self.__event_prefix = "book"
 
@@ -73,7 +75,11 @@ class DownloadRepo:
     ) -> Download:
         """Create a new download request"""
 
-        new_record = Download(**new.model_dump())
+        presigned_url = await self.__s3.generate_ebook_presigned_url()
+        new_record = Download(
+            **new.model_dump(),
+            presigned_url=presigned_url,
+        )
 
         stmt = select(Download).where(
             Download.email == new_record.email,
@@ -91,7 +97,7 @@ class DownloadRepo:
 
         self.__session.add(new_record)
 
-        logger.info("Creating download", download=new_record.model_dump_json())
+        logger.info("Creating record", record=new_record.model_dump_json())
 
         await self.__session.commit()
         await self.__session.refresh(new_record)
