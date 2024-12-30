@@ -34,9 +34,9 @@ class Ses:
     async def send_email(self, to: str, subject: str, body: str) -> str:
         """Send an email using SES.
 
-        * email: the recipient email
+        * to: the recipient email
         * subject: the email subject
-        * html_content: the email content in HTML format
+        * body: the email content in HTML format
 
         Returns
         -------

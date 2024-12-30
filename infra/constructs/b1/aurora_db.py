@@ -78,11 +78,13 @@ class B1AuroraDB(Construct):
             ),
         )
 
-        self.security_group = ec2.SecurityGroup(
+        kms_key = kms.Key.from_key_arn(
             scope=self,
-            id="SecurityGroup",
-            vpc=vpc,
-            description="Security group for the database",
+            id="KmsKey",
+            key_arn=ssm.StringParameter.value_for_string_parameter(
+                scope=self,
+                parameter_name="/platform/kms/default-key/arn",
+            ),
         )
 
         # CIDR block of the VPN
@@ -91,25 +93,18 @@ class B1AuroraDB(Construct):
             parameter_name="/vpn/transit-gateway/cidr-block",
         )
 
-        # Add ingress rules to the security group
-        self.security_group.connections.allow_from(
-            other=self.security_group,
-            port_range=ec2.Port.tcp(port),
-            description="Allow access to the database from the same security group",
+        self.security_group = ec2.SecurityGroup(
+            scope=self,
+            id="SecurityGroup",
+            vpc=vpc,
+            description="Security group for the database",
         )
+
+        # Add ingress rules to the security group
         self.security_group.add_ingress_rule(
             peer=ec2.Peer.ipv4(vpn_cidr_block),
             connection=ec2.Port.tcp(port),
             description="Allow access to the database from VPN",
-        )
-
-        kms_key = kms.Key.from_key_arn(
-            scope=self,
-            id="KmsKey",
-            key_arn=ssm.StringParameter.value_for_string_parameter(
-                scope=self,
-                parameter_name="/platform/kms/default-key/arn",
-            ),
         )
 
         # Credentials used to access the database
@@ -150,7 +145,7 @@ class B1AuroraDB(Construct):
             parameter_group=parameter_group,
             port=port,
             monitoring_interval=cdk.Duration.seconds(amount=monitoring_interval_seconds),
-            removal_policy=cdk.RemovalPolicy.DESTROY,
+            removal_policy=cdk.RemovalPolicy.DESTROY,  # Usually RETAIN in real-life
             serverless_v2_max_capacity=max_capacity,
             serverless_v2_min_capacity=min_capacity,
             security_groups=[self.security_group],
@@ -305,19 +300,6 @@ class B1AuroraDB(Construct):
             evaluation_periods=5,
             datapoints_to_alarm=3,
             comparison_operator=cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
-        )
-
-        # Alarm if the engine uptime is less than 10 minutes in a 1 minute period
-        B1Alarm(
-            scope=self,
-            id="EngineUptimeBelow10Minutes",
-            subscription_teams=subscription_teams,
-            alarm_description="Engine uptime is below 10 minutes. The database may be restarting.",
-            metric=self.cluster.metric_engine_uptime(period=cdk.Duration.minutes(amount=5), statistic=cw.Stats.MINIMUM),
-            threshold=10 * 60 * 1000,
-            evaluation_periods=1,
-            datapoints_to_alarm=1,
-            comparison_operator=cw.ComparisonOperator.LESS_THAN_OR_EQUAL_TO_THRESHOLD,
         )
 
         B1Alarm(
