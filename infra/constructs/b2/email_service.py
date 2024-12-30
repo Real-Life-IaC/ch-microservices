@@ -49,7 +49,7 @@ class B2EmailService(Construct):
         events_lambda = B1DockerLambdaFunction(
             scope=self,
             id="EventsLambda",
-            timeout_seconds=30,
+            timeout_seconds=90,
             memory_size=256,
             directory="functions/email_service",
             dockerfile="Dockerfile.lambda",
@@ -96,7 +96,7 @@ class B2EmailService(Construct):
         api_lambda = B1DockerLambdaFunction(
             scope=self,
             id="ApiLambda",
-            timeout_seconds=30,
+            timeout_seconds=90,
             memory_size=256,
             directory="functions/email_service",
             dockerfile="Dockerfile.lambda",
