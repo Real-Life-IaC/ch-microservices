@@ -45,7 +45,7 @@ class B1ApiGateway(Construct):
         throttling_burst_limit: int = 40,
         hosted_zone_type: str | None = None,
         cors_origins: list[str] | None = None,
-        latency_alarm_threshold_ms: int = 3000,
+        latency_alarm_threshold_seconds: int = 90,
         client_error_alarm_threshold: int = 10,
         server_error_alarm_threshold: int = 10,
     ) -> None:
@@ -64,7 +64,7 @@ class B1ApiGateway(Construct):
             throttling_rate_limit (int, optional): The rate limit for the API. Defaults to 20.
             throttling_burst_limit (int, optional): The burst limit for the API. Defaults to 40.
             cors_origins (list[str], optional): List of CORS origins. Defaults to ["*"].
-            latency_alarm_threshold_ms (int, optional): The threshold for the latency alarm in milliseconds. Defaults to 3000.
+            latency_alarm_threshold_seconds (int, optional): The threshold for the latency alarm in seconds. Defaults to 90.
             client_error_alarm_threshold (int, optional): The threshold for the client error alarm. Defaults to 10.
             server_error_alarm_threshold (int, optional): The threshold for the server error alarm. Defaults to 10.
 
@@ -248,9 +248,9 @@ class B1ApiGateway(Construct):
             scope=self,
             id="LatencyAlarm",
             subscription_teams=subscription_teams,
-            alarm_description=f"Latency is greater than {latency_alarm_threshold_ms}ms",
+            alarm_description=f"Latency is greater than {latency_alarm_threshold_seconds}s",
             metric=self.http_api.metric_latency(period=cdk.Duration.minutes(10), statistic=cw.Stats.AVERAGE),
-            threshold=latency_alarm_threshold_ms,
+            threshold=latency_alarm_threshold_seconds * 1000,
             evaluation_periods=5,
             datapoints_to_alarm=3,
             comparison_operator=cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
@@ -260,9 +260,9 @@ class B1ApiGateway(Construct):
             scope=self,
             id="IntegrationLatencyAlarm",
             subscription_teams=subscription_teams,
-            alarm_description=f"Integration latency is greater than {latency_alarm_threshold_ms * 0.8}ms",
+            alarm_description=f"Integration latency is greater than {latency_alarm_threshold_seconds * 0.8}s",
             metric=self.http_api.metric_integration_latency(period=cdk.Duration.minutes(10), statistic=cw.Stats.AVERAGE),
-            threshold=latency_alarm_threshold_ms * 0.8,
+            threshold=latency_alarm_threshold_seconds * 1000 * 0.8,
             evaluation_periods=5,
             datapoints_to_alarm=3,
             comparison_operator=cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
