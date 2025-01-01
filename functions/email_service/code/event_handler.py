@@ -22,7 +22,6 @@ async def process(parsed_event: EventBridgeEvent) -> None:
     """Process events."""
 
     async with get_eventbridge_context() as eventbridge, get_ses_context() as ses, get_session_context() as session:
-
         book_request_repo = BookRequestRepo(eventbridge=eventbridge, ses=ses)
         mailing_repo = MailingRepo(eventbridge=eventbridge, session=session)
 

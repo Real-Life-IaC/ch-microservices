@@ -124,7 +124,7 @@ class B1ApiGateway(Construct):
         )
 
         self.cors_options = apigwv2.CorsPreflightOptions(
-            allow_origins=[f"https://{self.hosted_zone.zone_name}", *cors_origins],
+            allow_origins=[f"https://{self.hosted_zone.zone_name}", f"https://www.{self.hosted_zone.zone_name}", *cors_origins],
             allow_methods=[apigwv2.CorsHttpMethod.ANY],
             allow_headers=["*"],
             allow_credentials=True,
