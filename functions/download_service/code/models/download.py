@@ -27,13 +27,18 @@ class Download(UuidModel, table=True):
         description="The name of the person who requested the download",
     )
 
-    link: str | None = Field(title="Link", description="The link to download the file with the token", default=None)
+    link: str | None = Field(
+        title="Link",
+        description="The link to download the file with the token",
+        default=None,
+    )
 
     expires_at: dt.datetime = Field(
         title="Expires at",
         sa_type=DateTime(timezone=True),
         description="The date and time until the token is valid",
-        default_factory=lambda: dt.datetime.now(dt.UTC) + dt.timedelta(hours=TOKEN_EXPIRATION_HOURS),
+        default_factory=lambda: dt.datetime.now(dt.UTC)
+        + dt.timedelta(hours=TOKEN_EXPIRATION_HOURS),
     )
 
     is_downloaded: bool = Field(
@@ -57,7 +62,7 @@ class Download(UuidModel, table=True):
     def __init__(self, **data) -> None:
         super().__init__(**data)
         if not self.link:
-            self.link = f"{FRONTEND_URL}/download/{self.id.hex}"
+            self.link = f"https://{FRONTEND_URL}/download/{self.id.hex}"
 
 
 class DownloadCreate(BaseModel):
