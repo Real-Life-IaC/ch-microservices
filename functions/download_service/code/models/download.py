@@ -37,8 +37,7 @@ class Download(UuidModel, table=True):
         title="Expires at",
         sa_type=DateTime(timezone=True),
         description="The date and time until the token is valid",
-        default_factory=lambda: dt.datetime.now(dt.UTC)
-        + dt.timedelta(hours=TOKEN_EXPIRATION_HOURS),
+        default_factory=lambda: dt.datetime.now(dt.UTC) + dt.timedelta(hours=TOKEN_EXPIRATION_HOURS),
     )
 
     is_downloaded: bool = Field(
