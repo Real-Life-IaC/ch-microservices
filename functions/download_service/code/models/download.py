@@ -27,7 +27,11 @@ class Download(UuidModel, table=True):
         description="The name of the person who requested the download",
     )
 
-    link: str | None = Field(title="Link", description="The link to download the file with the token", default=None)
+    link: str | None = Field(
+        title="Link",
+        description="The link to download the file with the token",
+        default=None,
+    )
 
     expires_at: dt.datetime = Field(
         title="Expires at",
@@ -57,7 +61,7 @@ class Download(UuidModel, table=True):
     def __init__(self, **data) -> None:
         super().__init__(**data)
         if not self.link:
-            self.link = f"{FRONTEND_URL}/download/{self.id.hex}"
+            self.link = f"https://{FRONTEND_URL}/download/{self.id.hex}"
 
 
 class DownloadCreate(BaseModel):
