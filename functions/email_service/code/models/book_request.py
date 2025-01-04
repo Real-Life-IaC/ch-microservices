@@ -8,6 +8,7 @@ class BookRequest(BaseModel):
 
     id: UUID
     name: str
+    country_code: str | None
     email: EmailStr
     presigned_url: str
     link: str

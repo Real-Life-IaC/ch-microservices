@@ -87,11 +87,11 @@ class B1AuroraDB(Construct):
             ),
         )
 
-        # CIDR block of the VPN
-        vpn_cidr_block = ssm.StringParameter.value_for_string_parameter(
-            scope=self,
-            parameter_name="/vpn/transit-gateway/cidr-block",
-        )
+        # # CIDR block of the VPN
+        # vpn_cidr_block = ssm.StringParameter.value_for_string_parameter(
+        #     scope=self,
+        #     parameter_name="/vpn/transit-gateway/cidr-block",
+        # )
 
         self.security_group = ec2.SecurityGroup(
             scope=self,
@@ -100,12 +100,12 @@ class B1AuroraDB(Construct):
             description="Security group for the database",
         )
 
-        # Add ingress rules to the security group
-        self.security_group.add_ingress_rule(
-            peer=ec2.Peer.ipv4(vpn_cidr_block),
-            connection=ec2.Port.tcp(port),
-            description="Allow access to the database from VPN",
-        )
+        # # Add ingress rules to the security group
+        # self.security_group.add_ingress_rule(
+        #     peer=ec2.Peer.ipv4(vpn_cidr_block),
+        #     connection=ec2.Port.tcp(port),
+        #     description="Allow access to the database from VPN",
+        # )
 
         # Credentials used to access the database
         self.credentials = rds.Credentials.from_generated_secret(  # nosec

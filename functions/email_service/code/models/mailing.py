@@ -24,6 +24,10 @@ class Mailing(UuidModel, table=True):
         description="The name of the person who requested the download",
     )
 
+    country_code: str | None = Field(
+        title="Country code", description="The country code of the person who requested the download", default=None,
+    )
+
     is_validated: bool = Field(
         title="Is validated",
         description="Flag to indicate if the email address was validated",
@@ -56,3 +60,4 @@ class MailingCreate(BaseModel):
 
     email: EmailStr
     name: str
+    country_code: str | None = None

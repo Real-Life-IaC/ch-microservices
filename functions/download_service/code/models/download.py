@@ -27,6 +27,10 @@ class Download(UuidModel, table=True):
         description="The name of the person who requested the download",
     )
 
+    country_code: str | None = Field(
+        title="Country code", description="The country code of the person who requested the download", default=None,
+    )
+
     link: str | None = Field(
         title="Link",
         description="The link to download the file with the token",
@@ -69,6 +73,7 @@ class DownloadCreate(BaseModel):
 
     name: str
     email: EmailStr
+    country_code: str | None = None
 
 
 class DownloadStatistics(BaseModel):
