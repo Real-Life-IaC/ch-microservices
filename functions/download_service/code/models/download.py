@@ -28,7 +28,9 @@ class Download(UuidModel, table=True):
     )
 
     country_code: str | None = Field(
-        title="Country code", description="The country code of the person who requested the download", default=None,
+        title="Country code",
+        description="The country code of the person who requested the download",
+        default=None,
     )
 
     link: str | None = Field(
