@@ -89,3 +89,4 @@ class DownloadResponse(BaseModel):
     """Pydantic model to return the presigned URL"""
 
     url: str
+    email: EmailStr

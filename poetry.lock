@@ -216,13 +216,13 @@ tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
 
 [[package]]
 name = "aws-cdk-asset-awscli-v1"
-version = "2.2.217"
+version = "2.2.218"
 description = "A library that contains the AWS CLI for use in Lambda Layers"
 optional = false
 python-versions = "~=3.8"
 files = [
-    {file = "aws_cdk.asset_awscli_v1-2.2.217-py3-none-any.whl", hash = "sha256:06a3f2bf2eb1a0067829743c2f514094dc21a958b4ad0ab58e589cc3763c6c77"},
-    {file = "aws_cdk_asset_awscli_v1-2.2.217.tar.gz", hash = "sha256:b827df8b01c90f165ddd807df833025936b41716322fbc5f76266514f54fb71a"},
+    {file = "aws_cdk.asset_awscli_v1-2.2.218-py3-none-any.whl", hash = "sha256:82efa0f11788c23c77e42a2bc0d29cae8accf79e00cfd4464efd5f7c25a18673"},
+    {file = "aws_cdk_asset_awscli_v1-2.2.218.tar.gz", hash = "sha256:3543f1f2ace5898087516fc0ac510825245d413fd79c50b331f8045b13ddab65"},
 ]
 
 [package.dependencies]
@@ -264,36 +264,36 @@ typeguard = ">=2.13.3,<5.0.0"
 
 [[package]]
 name = "aws-cdk-cloud-assembly-schema"
-version = "38.0.1"
+version = "39.1.38"
 description = "Cloud Assembly Schema"
 optional = false
 python-versions = "~=3.8"
 files = [
-    {file = "aws_cdk.cloud_assembly_schema-38.0.1-py3-none-any.whl", hash = "sha256:92613b46213b460681e9424f09b77f06ff059eb1c773092540364ef82fcecf55"},
-    {file = "aws_cdk_cloud_assembly_schema-38.0.1.tar.gz", hash = "sha256:7c75861adc41f7b959910d4b3b191ea242815402e599dbfa31934892838ae25e"},
+    {file = "aws_cdk.cloud_assembly_schema-39.1.38-py3-none-any.whl", hash = "sha256:42844a0aa2581c9c2fac51ccbb58862c35083ec309607345b711b8b62de98821"},
+    {file = "aws_cdk_cloud_assembly_schema-39.1.38.tar.gz", hash = "sha256:b10473f8ea339713fdd456e510932132cc15f1f3198138623ec2ea9376153413"},
 ]
 
 [package.dependencies]
-jsii = ">=1.103.1,<2.0.0"
+jsii = ">=1.106.0,<2.0.0"
 publication = ">=0.0.3"
-typeguard = ">=2.13.3,<5.0.0"
+typeguard = ">=2.13.3,<4.3.0"
 
 [[package]]
 name = "aws-cdk-lib"
-version = "2.173.4"
+version = "2.174.1"
 description = "Version 2 of the AWS Cloud Development Kit library"
 optional = false
 python-versions = "~=3.8"
 files = [
-    {file = "aws_cdk_lib-2.173.4-py3-none-any.whl", hash = "sha256:f6cdf37deaac8f675d1e91e8562d79bdff3c6aa824fb3d52bff72325186f7c45"},
-    {file = "aws_cdk_lib-2.173.4.tar.gz", hash = "sha256:89e5423fd4fde487b1310e380090acfb44ae9ce48fe6ee2b1f88450b73e5f6a4"},
+    {file = "aws_cdk_lib-2.174.1-py3-none-any.whl", hash = "sha256:722a64287779fed2d5a71015b5976661158c2dd59079919524e52c57f4d295a4"},
+    {file = "aws_cdk_lib-2.174.1.tar.gz", hash = "sha256:42c05e806673f34bdd2c80298b706aa2f9bb4bdcddc13a649666e2d43d0a884f"},
 ]
 
 [package.dependencies]
 "aws-cdk.asset-awscli-v1" = ">=2.2.208,<3.0.0"
 "aws-cdk.asset-kubectl-v20" = ">=2.1.3,<3.0.0"
 "aws-cdk.asset-node-proxy-agent-v6" = ">=2.1.0,<3.0.0"
-"aws-cdk.cloud-assembly-schema" = ">=38.0.1,<39.0.0"
+"aws-cdk.cloud-assembly-schema" = ">=39.0.1,<40.0.0"
 constructs = ">=10.0.0,<11.0.0"
 jsii = ">=1.104.0,<2.0.0"
 publication = ">=0.0.3"
@@ -479,13 +479,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.35.92"
+version = "1.35.93"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.35.92-py3-none-any.whl", hash = "sha256:f94ae1e056a675bd67c8af98a6858d06e3927d974d6c712ed6e27bb1d11bee1d"},
-    {file = "botocore-1.35.92.tar.gz", hash = "sha256:caa7d5d857fed5b3d694b89c45f82b9f938f840e90a4eb7bf50aa65da2ba8f82"},
+    {file = "botocore-1.35.93-py3-none-any.whl", hash = "sha256:47f7161000af6036f806449e3de12acdd3ec11aac7f5578e43e96241413a0f8f"},
+    {file = "botocore-1.35.93.tar.gz", hash = "sha256:b8d245a01e7d64c41edcf75a42be158df57b9518a83a3dbf5c7e4b8c2bc540cc"},
 ]
 
 [package.dependencies]
@@ -746,13 +746,13 @@ files = [
 
 [[package]]
 name = "checkov"
-version = "3.2.346"
+version = "3.2.350"
 description = "Infrastructure as code static analysis"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "checkov-3.2.346-py3-none-any.whl", hash = "sha256:ab9abfcb80cc1de0cbfe6f95a1ef985e28cfa30d01179f3669fdbd4dc87b463a"},
-    {file = "checkov-3.2.346.tar.gz", hash = "sha256:521c41c27c190b131873871cbb42791611ccd7f7a4ea6335ba35e34a25f7d709"},
+    {file = "checkov-3.2.350-py3-none-any.whl", hash = "sha256:56cdf813f986e262c49eab5852a2933e443732fb24aa653d4d23119589e78fea"},
+    {file = "checkov-3.2.350.tar.gz", hash = "sha256:878bceea001dcd768fcc556a49871e6f8c21779467102c973788ba03964415a2"},
 ]
 
 [package.dependencies]
@@ -1372,13 +1372,13 @@ test = ["objgraph", "psutil"]
 
 [[package]]
 name = "identify"
-version = "2.6.4"
+version = "2.6.5"
 description = "File identification library for Python"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "identify-2.6.4-py2.py3-none-any.whl", hash = "sha256:993b0f01b97e0568c179bb9196391ff391bfb88a99099dbf5ce392b68f42d0af"},
-    {file = "identify-2.6.4.tar.gz", hash = "sha256:285a7d27e397652e8cafe537a6cc97dd470a970f48fb2e9d979aa38eae5513ac"},
+    {file = "identify-2.6.5-py2.py3-none-any.whl", hash = "sha256:14181a47091eb75b337af4c23078c9d09225cd4c48929f521f3bf16b09d02566"},
+    {file = "identify-2.6.5.tar.gz", hash = "sha256:c10b33f250e5bba374fae86fb57f3adcebf1161bce7cdf92031915fd480c13bc"},
 ]
 
 [package.extras]

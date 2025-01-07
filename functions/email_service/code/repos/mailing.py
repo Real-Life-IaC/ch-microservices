@@ -133,3 +133,11 @@ class MailingRepo:
         )
 
         return record
+
+    async def is_subscribed(self, email: str) -> bool:
+        """Check if email is subscribed to mailing"""
+        stmt = select(Mailing).where(Mailing.email == email, Mailing.is_subscribed)
+        result = await self.__session.execute(stmt)
+        record = result.scalars().one_or_none()
+
+        return record.is_subscribed if record else False

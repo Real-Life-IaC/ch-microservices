@@ -38,6 +38,18 @@ async def download_statistics(
     return await repo.get_statistics()
 
 
+@router.get("/remind", status_code=status.HTTP_200_OK)
+async def remind_book(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    eventbridge: Annotated[EventBridge, Depends(get_eventbridge)],
+    s3: Annotated[S3, Depends(get_s3)],
+) -> dict:
+    """Remind the users to download the book"""
+
+    repo = DownloadRepo(session=session, eventbridge=eventbridge, s3=s3)
+    return await repo.remind()
+
+
 @router.get("/{token}", response_model=DownloadResponse)
 async def download_book(
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -50,7 +62,10 @@ async def download_book(
     repo = DownloadRepo(session=session, eventbridge=eventbridge, s3=s3)
     download = await repo.get(token)
 
-    return DownloadResponse(url=download.presigned_url)
+    return DownloadResponse(
+        url=download.presigned_url,
+        email=download.email,
+    )
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)

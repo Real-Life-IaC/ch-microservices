@@ -26,8 +26,15 @@ async def process(parsed_event: EventBridgeEvent) -> None:
         mailing_repo = MailingRepo(eventbridge=eventbridge, session=session)
 
         if parsed_event.detail_type == "book.requested":
-            await book_request_repo.send(BookRequest(**parsed_event.detail))
+            await book_request_repo.send_book(BookRequest(**parsed_event.detail))
             await mailing_repo.create(new=MailingCreate(**parsed_event.detail))
+
+        if parsed_event.detail_type == "book.reminded":
+            book_request = BookRequest(**parsed_event.detail)
+            is_subscribed = await mailing_repo.is_subscribed(email=book_request.email)
+            logger.info("Checking if user is subscribed to mainling", email=book_request.email, is_subscribed=is_subscribed)
+            if is_subscribed:
+                await book_request_repo.send_reminder(book_request)
 
         elif parsed_event.detail_type == "book.downloaded":
             await mailing_repo.validate(email=parsed_event.detail["email"])

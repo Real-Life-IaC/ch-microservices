@@ -83,17 +83,17 @@
   <body>
     <div class="email-container">
       <div class="email-header">
-        <h1>Your eBook is Ready!</h1>
+        <h1>Looks like you missed the eBook!</h1>
       </div>
 
       <div class="email-body">
         <p>Hi {{name}},</p>
         <p>
-          Thank you for signing up for a copy of <strong>Real-Life
-          Infrastructure as Code with AWS CDK</strong>.
+          I noticed that you requested a copy of <strong>Real-Life
+          Infrastructure as Code with AWS CDK</strong> but didn't download it yet.
         </p>
         <p>
-          You can download your eBook by clicking the button below:
+          Your previous link already expired, so I created a fresh one for you. You just need to click the button below to download it!
         </p>
         <a href="{{file_link}}" target="_blank" class="button" style="color: #ffffff !important;">Download eBook</a>
         <p>
@@ -102,7 +102,9 @@
         <p>
           <a href="{{file_link}}" target="_blank" >{{file_link}}</a>
         </p>
-        <p> <b>Hurry! The link expires in 48 hours!</b></p>
+        <p> <b>Hurry! The link expires in 48 hours and is valid only once!</b></p>
+        <p> You can always fill in the form <a href="https://real-life-iac.com" target="_blank">on the website</a> to request a
+          fresh link if you need to download it again.</p>
       </div>
 
       <!-- Footer -->
