@@ -41,12 +41,6 @@ class DownloadRepo:
                 detail="Invalid link.",
             )
 
-        if record.is_downloaded:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Link already used.",
-            )
-
         if current_timestamp > record.expires_at:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
