@@ -29,7 +29,7 @@ async def process(parsed_event: EventBridgeEvent) -> None:
             await book_request_repo.send_book(BookRequest(**parsed_event.detail))
             await mailing_repo.create(new=MailingCreate(**parsed_event.detail))
 
-        if parsed_event.detail_type == "book.reminded":
+        elif parsed_event.detail_type == "book.reminded":
             book_request = BookRequest(**parsed_event.detail)
             is_subscribed = await mailing_repo.is_subscribed(email=book_request.email)
             logger.info("Checking if user is subscribed to mainling", email=book_request.email, is_subscribed=is_subscribed)
@@ -41,7 +41,7 @@ async def process(parsed_event: EventBridgeEvent) -> None:
 
         else:
             msg = "Unhandled event type"
-            logger.exception("Unhandled event type", event_type=parsed_event.detail_type)
+            logger.exception("Unhandled event type", full_event=parsed_event)
             raise RuntimeError(msg)
 
 

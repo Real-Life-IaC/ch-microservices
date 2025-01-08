@@ -33,11 +33,12 @@ class MailingRepo:
         record = result.scalars().one_or_none()
 
         if record:
-            logger.info("Mailing already exists", Mailing=new.model_dump_json())
+            logger.info("Mailing already exists", email=new.email)
             return record
 
-        logger.info("Creating new Mailing", Mailing=new.model_dump_json())
-        self.__session.add(Mailing(**new.model_dump()))
+        record = Mailing(**new.model_dump())
+        logger.info("Creating new Mailing", mailing=record.model_dump_json())
+        self.__session.add(record)
 
         await self.__session.commit()
         await self.__eventbridge.put_event(
@@ -47,7 +48,7 @@ class MailingRepo:
             detail=new.model_dump_json(),
         )
 
-        return new
+        return record
 
     @tracer.capture_method(capture_response=False)
     async def validate(
@@ -63,6 +64,7 @@ class MailingRepo:
         record.is_validated = True
         record.validated_at = dt.datetime.now(tz=dt.UTC)
 
+        logger.info("Validating Mailing", email=record.email)
         await self.__session.commit()
         await self.__session.refresh(record)
         await self.__eventbridge.put_event(

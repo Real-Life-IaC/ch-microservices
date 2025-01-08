@@ -12,3 +12,4 @@ CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*").split(",")
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
 TOKEN_EXPIRATION_HOURS = 48
 BACKOFF_SECONDS = 90
+S3_SECRET_NAME = os.environ.get("S3_SECRET_NAME", "/s3")
