@@ -134,8 +134,8 @@ class DownloadRepo:
             .group_by(Download.email, Download.name, Download.country_code)
             .having(
                 func.sum(cast(Download.is_downloaded, Integer)) == 0,
-                func.count() == 1,
-                func.max(Download.expires_at) > dt.datetime.now(dt.UTC) + dt.timedelta(days=2),
+                func.count() <= 2,
+                func.max(Download.expires_at) < dt.datetime.now(dt.UTC),
             )
         )
 

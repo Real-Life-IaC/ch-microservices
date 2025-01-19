@@ -5,6 +5,9 @@ description = "Download service API Handler"
 authors = ["Andre Sionek <andre@real-life-iac.com>"]
 package-mode = false
 
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">1.8"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 aws-lambda-powertools = {version = "^3.2.0", extras = ["tracer"]}
@@ -19,6 +22,7 @@ sqlmodel = "^0.0.22"
 alembic = "^1.14.0"
 sqlalchemy = "^2.0.32"
 asyncpg = "^0.29.0"
+poetry = "^2.0.0"
 
 [tool.poetry.group.test]
 optional = true
