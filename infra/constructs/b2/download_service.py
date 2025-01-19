@@ -1,6 +1,9 @@
+import aws_cdk as cdk
 from aws_cdk import (
     aws_ec2 as ec2,
     aws_events as events,
+    aws_iam as iam,
+    aws_secretsmanager as secretsmanager,
     aws_ssm as ssm,
 )
 from constructs import Construct
@@ -52,11 +55,24 @@ class B2DownloadService(Construct):
             description="Security group for the download service",
         )
 
+        s3_user = iam.User(scope=self, id="S3User")
+        s3_access_key = iam.AccessKey(scope=self, id="S3AccessKey", user=s3_user)
+        s3_secret = secretsmanager.Secret(
+            scope=self,
+            id="S3SecretAccessKeyId",
+            secret_object_value={
+                "access_key_id": cdk.SecretValue.unsafe_plain_text(s3_access_key.access_key_id),
+                "secret_access_key": s3_access_key.secret_access_key,
+            },
+        )
+
         bucket = B1Bucket(
             scope=self,
             id="Bucket",
             service_name=f"{service_name}/bucket",
         )
+
+        bucket.grant_read(s3_user, objects_key_pattern=ebook_object_key)
 
         # Lambda to handle API requests
         api_lambda = B1DockerLambdaFunction(
@@ -78,13 +94,13 @@ class B2DownloadService(Construct):
                 "EBOOK_OBJECT_KEY": ebook_object_key,
                 "FRONTEND_URL": api_gateway.hosted_zone.zone_name,
                 "CORS_ORIGINS": ",".join(api_gateway.cors_options.allow_origins),
+                "S3_SECRET_NAME": s3_secret.secret_name,
             },
         )
 
         aurora_db.security_group.add_ingress_rule(peer=self.security_group, connection=ec2.Port.tcp(5432))
 
         aurora_db.cluster.secret.grant_read(api_lambda.function)
-        bucket.grant_read(api_lambda.function, objects_key_pattern=ebook_object_key)
         event_bus.grant_put_events_to(api_lambda.function)
-
+        s3_secret.grant_read(api_lambda.function)
         api_gateway.add_lambda_route(path="download", handler=api_lambda.function)

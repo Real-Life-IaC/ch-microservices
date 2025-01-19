@@ -3,12 +3,13 @@ from code.environment import BACKOFF_SECONDS, SERVICE_NAME
 from code.eventbridge import EventBridge
 from code.models import Download, DownloadCreate, DownloadStatistics
 from code.s3 import S3
+from typing import NamedTuple
 from uuid import UUID
 
 from aws_lambda_powertools import Logger, Tracer
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import func, select
+from sqlmodel import Integer, cast, func, select
 
 
 tracer = Tracer(service=SERVICE_NAME)
@@ -38,12 +39,6 @@ class DownloadRepo:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Invalid link.",
-            )
-
-        if record.is_downloaded:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Link already used.",
             )
 
         if current_timestamp > record.expires_at:
@@ -124,3 +119,57 @@ class DownloadRepo:
         requested_count = result.scalar_one()
 
         return DownloadStatistics(requested=requested_count, downloaded=downloaded_count)
+
+    @tracer.capture_method(capture_response=False)
+    async def remind(
+        self,
+    ) -> dict:
+        """Remind the users to download the book"""
+        query = (
+            select(
+                Download.name,
+                Download.email,
+                Download.country_code,
+            )
+            .group_by(Download.email, Download.name, Download.country_code)
+            .having(
+                func.sum(cast(Download.is_downloaded, Integer)) == 0,
+                func.count() <= 2,
+                func.max(Download.expires_at) < dt.datetime.now(dt.UTC),
+            )
+        )
+
+        result = await self.__session.execute(query)
+
+        class Record(NamedTuple):
+            name: str
+            email: str
+            country_code: str
+
+        records = [Record(*row) for row in result.all()]
+
+        logger.info("Found persons to remind", qty=len(records))
+
+        for record in records:
+            presigned_url = await self.__s3.generate_ebook_presigned_url()
+            new_record = Download(
+                name=record.name,
+                email=record.email,
+                country_code=record.country_code,
+                presigned_url=presigned_url,
+            )
+
+            self.__session.add(new_record)
+
+            logger.info("Reminding", record=new_record.model_dump_json())
+
+            await self.__session.commit()
+            await self.__session.refresh(new_record)
+            await self.__eventbridge.put_event(
+                source=self.__event_source,
+                prefix=self.__event_prefix,
+                type="reminded",
+                detail=new_record.model_dump_json(),
+            )
+
+        return {"message": "Reminders sent.", "qty": len(records)}

@@ -40,6 +40,7 @@ class B1AuroraDB(Construct):
         backup_retention_days: cdk.Duration = cdk.Duration.days(15),
         log_retention: logs.RetentionDays = logs.RetentionDays.ONE_MONTH,
         monitoring_interval_seconds: int = 60,
+        enable_cluster_level_enhanced_monitoring: bool = False,
         num_reader_instances: int = 0,
         max_capacity: float = 1,
         min_capacity: float = 0,
@@ -59,6 +60,7 @@ class B1AuroraDB(Construct):
             backup_retention_days (cdk.Duration, optional): Backup retention days for the database (default: cdk.Duration.days(15))
             log_retention (logs.RetentionDays, optional): Log retention for the database (default: logs.RetentionDays.ONE_MONTH)
             monitoring_interval_seconds (int, optional): Monitoring interval for the database (default: 60)
+            enable_cluster_level_enhanced_monitoring (bool, optional): Enable cluster level enhanced monitoring for the database (default: False)
             num_reader_instances (int, optional): Number of reader instances for the database (default: 0)
             max_capacity (float, optional): Maximum capacity for the database (default: 2)
             min_capacity (float, optional): Minimum capacity for the database (default: 0.5)
@@ -87,11 +89,11 @@ class B1AuroraDB(Construct):
             ),
         )
 
-        # CIDR block of the VPN
-        vpn_cidr_block = ssm.StringParameter.value_for_string_parameter(
-            scope=self,
-            parameter_name="/vpn/transit-gateway/cidr-block",
-        )
+        # # CIDR block of the VPN
+        # vpn_cidr_block = ssm.StringParameter.value_for_string_parameter(
+        #     scope=self,
+        #     parameter_name="/vpn/transit-gateway/cidr-block",
+        # )
 
         self.security_group = ec2.SecurityGroup(
             scope=self,
@@ -100,12 +102,12 @@ class B1AuroraDB(Construct):
             description="Security group for the database",
         )
 
-        # Add ingress rules to the security group
-        self.security_group.add_ingress_rule(
-            peer=ec2.Peer.ipv4(vpn_cidr_block),
-            connection=ec2.Port.tcp(port),
-            description="Allow access to the database from VPN",
-        )
+        # # Add ingress rules to the security group
+        # self.security_group.add_ingress_rule(
+        #     peer=ec2.Peer.ipv4(vpn_cidr_block),
+        #     connection=ec2.Port.tcp(port),
+        #     description="Allow access to the database from VPN",
+        # )
 
         # Credentials used to access the database
         self.credentials = rds.Credentials.from_generated_secret(  # nosec
@@ -144,6 +146,7 @@ class B1AuroraDB(Construct):
             iam_authentication=True,
             parameter_group=parameter_group,
             port=port,
+            enable_cluster_level_enhanced_monitoring=enable_cluster_level_enhanced_monitoring,
             monitoring_interval=cdk.Duration.seconds(amount=monitoring_interval_seconds),
             removal_policy=cdk.RemovalPolicy.DESTROY,  # Usually RETAIN in real-life
             serverless_v2_max_capacity=max_capacity,
@@ -214,10 +217,10 @@ class B1AuroraDB(Construct):
             id="AvailableMemoryBelow256mb",
             subscription_teams=subscription_teams,
             alarm_description="Memory available is below 256mb",
-            metric=self.cluster.metric_freeable_memory(period=cdk.Duration.minutes(amount=10), statistic=cw.Stats.AVERAGE),
+            metric=self.cluster.metric_freeable_memory(period=cdk.Duration.minutes(amount=20), statistic=cw.Stats.AVERAGE),
             threshold=256 * 1024 * 1024,
-            evaluation_periods=5,
-            datapoints_to_alarm=3,
+            evaluation_periods=10,
+            datapoints_to_alarm=8,
             comparison_operator=cw.ComparisonOperator.LESS_THAN_OR_EQUAL_TO_THRESHOLD,
         )
 
@@ -240,10 +243,10 @@ class B1AuroraDB(Construct):
             id="CPUUtilizationAbove90",
             subscription_teams=subscription_teams,
             alarm_description="CPU utilization is above 90pct",
-            metric=self.cluster.metric_cpu_utilization(period=cdk.Duration.minutes(amount=10), statistic=cw.Stats.AVERAGE),
+            metric=self.cluster.metric_cpu_utilization(period=cdk.Duration.minutes(amount=20), statistic=cw.Stats.AVERAGE),
             threshold=90,
-            evaluation_periods=5,
-            datapoints_to_alarm=3,
+            evaluation_periods=10,
+            datapoints_to_alarm=8,
             comparison_operator=cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
         )
 
@@ -270,35 +273,6 @@ class B1AuroraDB(Construct):
             threshold=0,
             evaluation_periods=1,
             datapoints_to_alarm=1,
-            comparison_operator=cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
-        )
-
-        # Alarm if ACU Utilization is greater than 90% in 5/10 of a 3 minute period
-        B1Alarm(
-            scope=self,
-            id="ACUUtilizationAbove90",
-            subscription_teams=subscription_teams,
-            alarm_description="ACU utilization is above 90pct",
-            metric=self.cluster.metric_acu_utilization(period=cdk.Duration.minutes(amount=10), statistic=cw.Stats.AVERAGE),
-            threshold=90,
-            evaluation_periods=5,
-            datapoints_to_alarm=3,
-            comparison_operator=cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
-        )
-
-        # Alarm if database capacity is greater than 6 in 2/5 a 20 minute period
-        B1Alarm(
-            scope=self,
-            id="DatabaseCapacityAbove6ACUs",
-            subscription_teams=subscription_teams,
-            alarm_description="The database capacity is above 6 ACUs",
-            metric=self.cluster.metric_serverless_database_capacity(
-                period=cdk.Duration.minutes(amount=20),
-                statistic=cw.Stats.AVERAGE,
-            ),
-            threshold=6,
-            evaluation_periods=5,
-            datapoints_to_alarm=3,
             comparison_operator=cw.ComparisonOperator.GREATER_THAN_THRESHOLD,
         )
 

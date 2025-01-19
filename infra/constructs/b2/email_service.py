@@ -86,6 +86,7 @@ class B2EmailService(Construct):
                 detail_type=events.Match.any_of(
                     "book.requested",
                     "book.downloaded",
+                    "book.reminded",
                 ),
             ),
         )
